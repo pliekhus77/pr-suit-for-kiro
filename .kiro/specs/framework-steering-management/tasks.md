@@ -332,8 +332,6 @@ This implementation plan breaks down the Framework Steering Management feature i
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8_
   
   - [x] 13.4 Unit tests for TemplateEngine
-
-
     - Test variable substitution with {{feature-name}}, {{date}}, {{author}}
     - Test multiple variables in single template
     - Test undefined variable handling (leave as-is vs empty string)
