@@ -468,13 +468,15 @@ This implementation plan breaks down the Framework Steering Management feature i
     - _Requirements: All_
 
 - [ ] 18. Error handling and edge case tests (Priority 3 - Nice to Have)
-  - [ ] 18.1 Permission and access error tests
+  - [x] 18.1 Permission and access error tests
     - Test file operations with read-only files
     - Test directory creation with insufficient permissions
     - Test file deletion with locked files
     - Test operations on network drives with connectivity issues
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
-  
+
+  - [-] 18.2 Boundary condition tests
+
   - [ ] 18.2 Boundary condition tests
     - Test with empty workspace (no files)
     - Test with workspace containing only .kiro/ file (not directory)
