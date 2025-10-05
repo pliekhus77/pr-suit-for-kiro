@@ -149,6 +149,14 @@ export class FrameworkManager {
   }
 
   /**
+   * Get list of installed frameworks metadata
+   */
+  async getInstalledFrameworksMetadata(): Promise<InstalledFramework[]> {
+    const metadata = await this.getInstalledMetadata();
+    return metadata.frameworks;
+  }
+
+  /**
    * Install a framework with conflict handling
    */
   async installFramework(frameworkId: string, options?: InstallOptions): Promise<void> {

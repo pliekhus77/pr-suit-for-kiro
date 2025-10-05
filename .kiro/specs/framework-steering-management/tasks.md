@@ -343,7 +343,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
 - [ ] 14. Complete integration test coverage (Priority 1 - Critical)
-  - [ ] 14.1 Browse frameworks command - missing scenarios
+  - [x] 14.1 Browse frameworks command - missing scenarios
     - Test "No frameworks available" message when manifest is empty
     - Test installation failure handling with error notification
     - Test framework already installed with overwrite prompt flow
