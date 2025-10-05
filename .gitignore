@@ -20,3 +20,7 @@ dist/
 
 # Jest
 coverage/
+
+# BDD Tests
+tests/bdd/reports/
+test-workspace/

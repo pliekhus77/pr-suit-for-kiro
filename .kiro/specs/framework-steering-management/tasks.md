@@ -406,7 +406,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
 
 - [ ] 16. BDD acceptance tests (Priority 2 - Important)
-  - [ ] 16.1 Set up BDD testing infrastructure
+  - [x] 16.1 Set up BDD testing infrastructure
     - Install and configure Reqnroll (or Cucumber) for TypeScript
     - Set up Playwright for browser automation (if needed for webviews)
     - Create feature file directory structure (tests/bdd/features/)
