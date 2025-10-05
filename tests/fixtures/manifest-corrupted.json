@@ -1,0 +1,113 @@
+{
+  "version": "",
+  "frameworks": [
+    {
+      "id": "",
+      "name": "",
+      "description": "",
+      "category": "invalid-category",
+      "version": "",
+      "fileName": ""
+    },
+    {
+      "id": "missing-fields",
+      "name": "Framework Missing Fields"
+    },
+    {
+      "id": "invalid-version",
+      "name": "Framework with Invalid Version",
+      "description": "This framework has an invalid version number",
+      "category": "testing",
+      "version": "not-a-version",
+      "fileName": "invalid-version.md"
+    },
+    {
+      "id": "very-long-id-that-exceeds-reasonable-length-limits-and-should-cause-validation-errors-in-any-system-that-has-proper-validation-this-id-is-intentionally-made-extremely-long-to-test-boundary-conditions-and-error-handling-capabilities-of-the-framework-management-system",
+      "name": "Framework with Extremely Long ID",
+      "description": "This framework has an unreasonably long ID",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": "long-id.md"
+    },
+    {
+      "id": "special-chars-!@#$%^&*()",
+      "name": "Framework with Special Characters in ID",
+      "description": "This framework has special characters that might break parsing",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": "special-chars.md"
+    },
+    {
+      "id": "circular-dependency-1",
+      "name": "Framework with Circular Dependency 1",
+      "description": "This framework depends on framework 2, which depends on this one",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": "circular-1.md",
+      "dependencies": ["circular-dependency-2"]
+    },
+    {
+      "id": "circular-dependency-2",
+      "name": "Framework with Circular Dependency 2",
+      "description": "This framework depends on framework 1, which depends on this one",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": "circular-2.md",
+      "dependencies": ["circular-dependency-1"]
+    },
+    {
+      "id": "missing-file",
+      "name": "Framework with Missing File",
+      "description": "This framework references a file that doesn't exist",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": ""
+    },
+    {
+      "id": null,
+      "name": null,
+      "description": null,
+      "category": null,
+      "version": null,
+      "fileName": null
+    },
+    {
+      "id": "duplicate-id",
+      "name": "First Framework with Duplicate ID",
+      "description": "This is the first framework with a duplicate ID",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": "duplicate-1.md"
+    },
+    {
+      "id": "duplicate-id",
+      "name": "Second Framework with Duplicate ID",
+      "description": "This is the second framework with the same ID",
+      "category": "testing",
+      "version": "2.0.0",
+      "fileName": "duplicate-2.md"
+    },
+    {
+      "id": "invalid-dependency",
+      "name": "Framework with Invalid Dependency",
+      "description": "This framework depends on a non-existent framework",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": "invalid-dep.md",
+      "dependencies": ["non-existent-framework", "another-missing-framework"]
+    },
+    {
+      "id": "malformed-json-test",
+      "name": "Framework to Test JSON Parsing",
+      "description": "This framework is valid but the manifest has issues",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": "malformed.md",
+      "extraField": "This field shouldn't be here",
+      "anotherExtraField": 12345,
+      "yetAnotherField": true
+    }
+  ],
+  "unexpectedField": "This field should not be in the manifest",
+  "anotherBadField": 999
+}

@@ -1,0 +1,962 @@
+{
+  "version": "1.0.0",
+  "frameworks": [
+    {
+      "id": "framework-1",
+      "name": "Framework 1",
+      "description": "This is test framework number 1 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.0.0",
+      "fileName": "framework-1.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-2",
+      "name": "Framework 2",
+      "description": "This is test framework number 2 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.0.1",
+      "fileName": "framework-2.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-3",
+      "name": "Framework 3",
+      "description": "This is test framework number 3 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.0.2",
+      "fileName": "framework-3.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-4",
+      "name": "Framework 4",
+      "description": "This is test framework number 4 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.0.3",
+      "fileName": "framework-4.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-5",
+      "name": "Framework 5",
+      "description": "This is test framework number 5 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.0.4",
+      "fileName": "framework-5.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-6",
+      "name": "Framework 6",
+      "description": "This is test framework number 6 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.0.5",
+      "fileName": "framework-6.md",
+      "dependencies": [
+        "framework-5",
+        "framework-4"
+      ]
+    },
+    {
+      "id": "framework-7",
+      "name": "Framework 7",
+      "description": "This is test framework number 7 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.0.6",
+      "fileName": "framework-7.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-8",
+      "name": "Framework 8",
+      "description": "This is test framework number 8 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.0.7",
+      "fileName": "framework-8.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-9",
+      "name": "Framework 9",
+      "description": "This is test framework number 9 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.0.8",
+      "fileName": "framework-9.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-10",
+      "name": "Framework 10",
+      "description": "This is test framework number 10 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.0.9",
+      "fileName": "framework-10.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-11",
+      "name": "Framework 11",
+      "description": "This is test framework number 11 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.1.0",
+      "fileName": "framework-11.md",
+      "dependencies": [
+        "framework-10",
+        "framework-9"
+      ]
+    },
+    {
+      "id": "framework-12",
+      "name": "Framework 12",
+      "description": "This is test framework number 12 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.1.1",
+      "fileName": "framework-12.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-13",
+      "name": "Framework 13",
+      "description": "This is test framework number 13 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.1.2",
+      "fileName": "framework-13.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-14",
+      "name": "Framework 14",
+      "description": "This is test framework number 14 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.1.3",
+      "fileName": "framework-14.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-15",
+      "name": "Framework 15",
+      "description": "This is test framework number 15 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.1.4",
+      "fileName": "framework-15.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-16",
+      "name": "Framework 16",
+      "description": "This is test framework number 16 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.1.5",
+      "fileName": "framework-16.md",
+      "dependencies": [
+        "framework-15",
+        "framework-14"
+      ]
+    },
+    {
+      "id": "framework-17",
+      "name": "Framework 17",
+      "description": "This is test framework number 17 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.1.6",
+      "fileName": "framework-17.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-18",
+      "name": "Framework 18",
+      "description": "This is test framework number 18 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.1.7",
+      "fileName": "framework-18.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-19",
+      "name": "Framework 19",
+      "description": "This is test framework number 19 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.1.8",
+      "fileName": "framework-19.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-20",
+      "name": "Framework 20",
+      "description": "This is test framework number 20 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.1.9",
+      "fileName": "framework-20.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-21",
+      "name": "Framework 21",
+      "description": "This is test framework number 21 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.2.0",
+      "fileName": "framework-21.md",
+      "dependencies": [
+        "framework-20",
+        "framework-19"
+      ]
+    },
+    {
+      "id": "framework-22",
+      "name": "Framework 22",
+      "description": "This is test framework number 22 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.2.1",
+      "fileName": "framework-22.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-23",
+      "name": "Framework 23",
+      "description": "This is test framework number 23 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.2.2",
+      "fileName": "framework-23.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-24",
+      "name": "Framework 24",
+      "description": "This is test framework number 24 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.2.3",
+      "fileName": "framework-24.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-25",
+      "name": "Framework 25",
+      "description": "This is test framework number 25 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.2.4",
+      "fileName": "framework-25.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-26",
+      "name": "Framework 26",
+      "description": "This is test framework number 26 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.2.5",
+      "fileName": "framework-26.md",
+      "dependencies": [
+        "framework-25",
+        "framework-24"
+      ]
+    },
+    {
+      "id": "framework-27",
+      "name": "Framework 27",
+      "description": "This is test framework number 27 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.2.6",
+      "fileName": "framework-27.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-28",
+      "name": "Framework 28",
+      "description": "This is test framework number 28 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.2.7",
+      "fileName": "framework-28.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-29",
+      "name": "Framework 29",
+      "description": "This is test framework number 29 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.2.8",
+      "fileName": "framework-29.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-30",
+      "name": "Framework 30",
+      "description": "This is test framework number 30 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.2.9",
+      "fileName": "framework-30.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-31",
+      "name": "Framework 31",
+      "description": "This is test framework number 31 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.3.0",
+      "fileName": "framework-31.md",
+      "dependencies": [
+        "framework-30",
+        "framework-29"
+      ]
+    },
+    {
+      "id": "framework-32",
+      "name": "Framework 32",
+      "description": "This is test framework number 32 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.3.1",
+      "fileName": "framework-32.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-33",
+      "name": "Framework 33",
+      "description": "This is test framework number 33 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.3.2",
+      "fileName": "framework-33.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-34",
+      "name": "Framework 34",
+      "description": "This is test framework number 34 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.3.3",
+      "fileName": "framework-34.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-35",
+      "name": "Framework 35",
+      "description": "This is test framework number 35 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.3.4",
+      "fileName": "framework-35.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-36",
+      "name": "Framework 36",
+      "description": "This is test framework number 36 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.3.5",
+      "fileName": "framework-36.md",
+      "dependencies": [
+        "framework-35",
+        "framework-34"
+      ]
+    },
+    {
+      "id": "framework-37",
+      "name": "Framework 37",
+      "description": "This is test framework number 37 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.3.6",
+      "fileName": "framework-37.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-38",
+      "name": "Framework 38",
+      "description": "This is test framework number 38 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.3.7",
+      "fileName": "framework-38.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-39",
+      "name": "Framework 39",
+      "description": "This is test framework number 39 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.3.8",
+      "fileName": "framework-39.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-40",
+      "name": "Framework 40",
+      "description": "This is test framework number 40 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.3.9",
+      "fileName": "framework-40.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-41",
+      "name": "Framework 41",
+      "description": "This is test framework number 41 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.4.0",
+      "fileName": "framework-41.md",
+      "dependencies": [
+        "framework-40",
+        "framework-39"
+      ]
+    },
+    {
+      "id": "framework-42",
+      "name": "Framework 42",
+      "description": "This is test framework number 42 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.4.1",
+      "fileName": "framework-42.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-43",
+      "name": "Framework 43",
+      "description": "This is test framework number 43 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.4.2",
+      "fileName": "framework-43.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-44",
+      "name": "Framework 44",
+      "description": "This is test framework number 44 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.4.3",
+      "fileName": "framework-44.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-45",
+      "name": "Framework 45",
+      "description": "This is test framework number 45 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.4.4",
+      "fileName": "framework-45.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-46",
+      "name": "Framework 46",
+      "description": "This is test framework number 46 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.4.5",
+      "fileName": "framework-46.md",
+      "dependencies": [
+        "framework-45",
+        "framework-44"
+      ]
+    },
+    {
+      "id": "framework-47",
+      "name": "Framework 47",
+      "description": "This is test framework number 47 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.4.6",
+      "fileName": "framework-47.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-48",
+      "name": "Framework 48",
+      "description": "This is test framework number 48 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.4.7",
+      "fileName": "framework-48.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-49",
+      "name": "Framework 49",
+      "description": "This is test framework number 49 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.4.8",
+      "fileName": "framework-49.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-50",
+      "name": "Framework 50",
+      "description": "This is test framework number 50 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.4.9",
+      "fileName": "framework-50.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-51",
+      "name": "Framework 51",
+      "description": "This is test framework number 51 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.5.0",
+      "fileName": "framework-51.md",
+      "dependencies": [
+        "framework-50",
+        "framework-49"
+      ]
+    },
+    {
+      "id": "framework-52",
+      "name": "Framework 52",
+      "description": "This is test framework number 52 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.5.1",
+      "fileName": "framework-52.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-53",
+      "name": "Framework 53",
+      "description": "This is test framework number 53 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.5.2",
+      "fileName": "framework-53.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-54",
+      "name": "Framework 54",
+      "description": "This is test framework number 54 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.5.3",
+      "fileName": "framework-54.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-55",
+      "name": "Framework 55",
+      "description": "This is test framework number 55 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.5.4",
+      "fileName": "framework-55.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-56",
+      "name": "Framework 56",
+      "description": "This is test framework number 56 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.5.5",
+      "fileName": "framework-56.md",
+      "dependencies": [
+        "framework-55",
+        "framework-54"
+      ]
+    },
+    {
+      "id": "framework-57",
+      "name": "Framework 57",
+      "description": "This is test framework number 57 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.5.6",
+      "fileName": "framework-57.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-58",
+      "name": "Framework 58",
+      "description": "This is test framework number 58 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.5.7",
+      "fileName": "framework-58.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-59",
+      "name": "Framework 59",
+      "description": "This is test framework number 59 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.5.8",
+      "fileName": "framework-59.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-60",
+      "name": "Framework 60",
+      "description": "This is test framework number 60 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.5.9",
+      "fileName": "framework-60.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-61",
+      "name": "Framework 61",
+      "description": "This is test framework number 61 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.6.0",
+      "fileName": "framework-61.md",
+      "dependencies": [
+        "framework-60",
+        "framework-59"
+      ]
+    },
+    {
+      "id": "framework-62",
+      "name": "Framework 62",
+      "description": "This is test framework number 62 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.6.1",
+      "fileName": "framework-62.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-63",
+      "name": "Framework 63",
+      "description": "This is test framework number 63 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.6.2",
+      "fileName": "framework-63.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-64",
+      "name": "Framework 64",
+      "description": "This is test framework number 64 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.6.3",
+      "fileName": "framework-64.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-65",
+      "name": "Framework 65",
+      "description": "This is test framework number 65 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.6.4",
+      "fileName": "framework-65.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-66",
+      "name": "Framework 66",
+      "description": "This is test framework number 66 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.6.5",
+      "fileName": "framework-66.md",
+      "dependencies": [
+        "framework-65",
+        "framework-64"
+      ]
+    },
+    {
+      "id": "framework-67",
+      "name": "Framework 67",
+      "description": "This is test framework number 67 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.6.6",
+      "fileName": "framework-67.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-68",
+      "name": "Framework 68",
+      "description": "This is test framework number 68 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.6.7",
+      "fileName": "framework-68.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-69",
+      "name": "Framework 69",
+      "description": "This is test framework number 69 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.6.8",
+      "fileName": "framework-69.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-70",
+      "name": "Framework 70",
+      "description": "This is test framework number 70 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.6.9",
+      "fileName": "framework-70.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-71",
+      "name": "Framework 71",
+      "description": "This is test framework number 71 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.7.0",
+      "fileName": "framework-71.md",
+      "dependencies": [
+        "framework-70",
+        "framework-69"
+      ]
+    },
+    {
+      "id": "framework-72",
+      "name": "Framework 72",
+      "description": "This is test framework number 72 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.7.1",
+      "fileName": "framework-72.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-73",
+      "name": "Framework 73",
+      "description": "This is test framework number 73 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.7.2",
+      "fileName": "framework-73.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-74",
+      "name": "Framework 74",
+      "description": "This is test framework number 74 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.7.3",
+      "fileName": "framework-74.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-75",
+      "name": "Framework 75",
+      "description": "This is test framework number 75 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.7.4",
+      "fileName": "framework-75.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-76",
+      "name": "Framework 76",
+      "description": "This is test framework number 76 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.7.5",
+      "fileName": "framework-76.md",
+      "dependencies": [
+        "framework-75",
+        "framework-74"
+      ]
+    },
+    {
+      "id": "framework-77",
+      "name": "Framework 77",
+      "description": "This is test framework number 77 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.7.6",
+      "fileName": "framework-77.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-78",
+      "name": "Framework 78",
+      "description": "This is test framework number 78 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.7.7",
+      "fileName": "framework-78.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-79",
+      "name": "Framework 79",
+      "description": "This is test framework number 79 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.7.8",
+      "fileName": "framework-79.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-80",
+      "name": "Framework 80",
+      "description": "This is test framework number 80 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.7.9",
+      "fileName": "framework-80.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-81",
+      "name": "Framework 81",
+      "description": "This is test framework number 81 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.8.0",
+      "fileName": "framework-81.md",
+      "dependencies": [
+        "framework-80",
+        "framework-79"
+      ]
+    },
+    {
+      "id": "framework-82",
+      "name": "Framework 82",
+      "description": "This is test framework number 82 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.8.1",
+      "fileName": "framework-82.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-83",
+      "name": "Framework 83",
+      "description": "This is test framework number 83 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.8.2",
+      "fileName": "framework-83.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-84",
+      "name": "Framework 84",
+      "description": "This is test framework number 84 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.8.3",
+      "fileName": "framework-84.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-85",
+      "name": "Framework 85",
+      "description": "This is test framework number 85 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.8.4",
+      "fileName": "framework-85.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-86",
+      "name": "Framework 86",
+      "description": "This is test framework number 86 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.8.5",
+      "fileName": "framework-86.md",
+      "dependencies": [
+        "framework-85",
+        "framework-84"
+      ]
+    },
+    {
+      "id": "framework-87",
+      "name": "Framework 87",
+      "description": "This is test framework number 87 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.8.6",
+      "fileName": "framework-87.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-88",
+      "name": "Framework 88",
+      "description": "This is test framework number 88 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.8.7",
+      "fileName": "framework-88.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-89",
+      "name": "Framework 89",
+      "description": "This is test framework number 89 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.8.8",
+      "fileName": "framework-89.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-90",
+      "name": "Framework 90",
+      "description": "This is test framework number 90 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.8.9",
+      "fileName": "framework-90.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-91",
+      "name": "Framework 91",
+      "description": "This is test framework number 91 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.9.0",
+      "fileName": "framework-91.md",
+      "dependencies": [
+        "framework-90",
+        "framework-89"
+      ]
+    },
+    {
+      "id": "framework-92",
+      "name": "Framework 92",
+      "description": "This is test framework number 92 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.9.1",
+      "fileName": "framework-92.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-93",
+      "name": "Framework 93",
+      "description": "This is test framework number 93 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.9.2",
+      "fileName": "framework-93.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-94",
+      "name": "Framework 94",
+      "description": "This is test framework number 94 for performance testing with large manifests",
+      "category": "security",
+      "version": "1.9.3",
+      "fileName": "framework-94.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-95",
+      "name": "Framework 95",
+      "description": "This is test framework number 95 for performance testing with large manifests",
+      "category": "devops",
+      "version": "1.9.4",
+      "fileName": "framework-95.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-96",
+      "name": "Framework 96",
+      "description": "This is test framework number 96 for performance testing with large manifests",
+      "category": "cloud",
+      "version": "1.9.5",
+      "fileName": "framework-96.md",
+      "dependencies": [
+        "framework-95",
+        "framework-94"
+      ]
+    },
+    {
+      "id": "framework-97",
+      "name": "Framework 97",
+      "description": "This is test framework number 97 for performance testing with large manifests",
+      "category": "infrastructure",
+      "version": "1.9.6",
+      "fileName": "framework-97.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-98",
+      "name": "Framework 98",
+      "description": "This is test framework number 98 for performance testing with large manifests",
+      "category": "work-management",
+      "version": "1.9.7",
+      "fileName": "framework-98.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-99",
+      "name": "Framework 99",
+      "description": "This is test framework number 99 for performance testing with large manifests",
+      "category": "architecture",
+      "version": "1.9.8",
+      "fileName": "framework-99.md",
+      "dependencies": []
+    },
+    {
+      "id": "framework-100",
+      "name": "Framework 100",
+      "description": "This is test framework number 100 for performance testing with large manifests",
+      "category": "testing",
+      "version": "1.9.9",
+      "fileName": "framework-100.md",
+      "dependencies": []
+    }
+  ]
+}

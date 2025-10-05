@@ -450,7 +450,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Implement fluent API for all builders
     - _Requirements: All_
   
-  - [ ] 17.2 Create test fixtures
+  - [x] 17.2 Create test fixtures
     - Create fixture for valid steering document with all sections
     - Create fixture for invalid steering document (missing sections)
     - Create fixture for large steering document (>1MB)
