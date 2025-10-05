@@ -441,7 +441,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Implement steps for "Search framework references" scenario
     - _Requirements: 7.1-7.6_
 
-- [ ] 17. Test data management and fixtures (Priority 2 - Important)
+- [x] 17. Test data management and fixtures (Priority 2 - Important)
   - [x] 17.1 Create test data builders
     - Create FrameworkBuilder for test framework objects
     - Create SteeringDocumentBuilder for test documents
