@@ -342,7 +342,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Test special characters in variable values
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 14. Complete integration test coverage (Priority 1 - Critical)
+- [x] 14. Complete integration test coverage (Priority 1 - Critical)
   - [x] 14.1 Browse frameworks command - missing scenarios
     - Test "No frameworks available" message when manifest is empty
     - Test installation failure handling with error notification
@@ -381,7 +381,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
 
 - [ ] 15. Performance testing and benchmarks (Priority 2 - Important)
-  - [ ] 15.1 Extension activation performance
+  - [x] 15.1 Extension activation performance
     - Benchmark extension activation time (target < 500ms)
     - Test activation with large workspaces (50+ installed frameworks)
     - Test activation with corrupted metadata (graceful degradation)

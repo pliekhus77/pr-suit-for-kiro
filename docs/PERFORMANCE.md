@@ -1,244 +1,236 @@
-# Performance Optimization Guide
+# Extension Activation Performance
+
+## Overview
+
+This document describes the performance testing strategy and results for the Pragmatic Rhino SUIT extension activation.
 
 ## Performance Targets
 
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| Extension Activation | < 500ms | ~200ms | ✅ |
-| Framework Installation | < 1s | ~500ms | ✅ |
-| Tree View Refresh | < 200ms | ~100ms | ✅ |
-| Validation | < 500ms | ~300ms | ✅ |
+| Metric | Target | Rationale |
+|--------|--------|-----------|
+| **Baseline Activation** | < 500ms | Fast startup for good UX |
+| **With 10 Frameworks** | < 1000ms | Reasonable with typical usage |
+| **With 50 Frameworks** | < 2000ms | Acceptable for large workspaces |
+| **With 100 Frameworks** | < 3000ms | Stress test boundary |
+| **Memory Increase (Baseline)** | < 50MB | Efficient memory usage |
+| **Memory Increase (50 Frameworks)** | < 100MB | Reasonable for large workspaces |
+| **Standard Deviation** | < 200ms | Consistent performance |
 
-## Optimization Strategies
+## Test Coverage
+
+### 1. Baseline Performance
+- **Test:** `Baseline: Extension activation time should be < 500ms`
+- **Purpose:** Establish baseline activation time with minimal workspace
+- **Success Criteria:** Activation completes in under 500ms
+
+### 2. Scalability Tests
+- **Test:** `Performance: Activation with 10 installed frameworks`
+- **Purpose:** Test typical workspace with moderate framework usage
+- **Success Criteria:** Activation completes in under 1000ms
+
+- **Test:** `Performance: Activation with 50 installed frameworks`
+- **Purpose:** Test large workspace with many frameworks
+- **Success Criteria:** Activation completes in under 2000ms
+
+- **Test:** `Stress Test: Activation with 100 frameworks`
+- **Purpose:** Stress test to identify performance boundaries
+- **Success Criteria:** Activation completes in under 3000ms
+
+### 3. Resilience Tests
+- **Test:** `Resilience: Activation with corrupted metadata should gracefully degrade`
+- **Purpose:** Ensure extension activates even with corrupted metadata
+- **Success Criteria:** 
+  - Activation completes in under 1000ms
+  - Extension remains active despite corruption
+  - No crashes or unhandled errors
+
+### 4. Memory Profiling
+- **Test:** `Memory: Memory usage during activation should be reasonable`
+- **Purpose:** Measure baseline memory consumption
+- **Success Criteria:** Memory increase < 50MB
+
+- **Test:** `Memory: Memory usage with 50 frameworks should be reasonable`
+- **Purpose:** Measure memory consumption with large workspace
+- **Success Criteria:** Memory increase < 100MB with 50 frameworks
+
+### 5. Lazy Loading Verification
+- **Test:** `Lazy Loading: Framework manifest should be loaded lazily`
+- **Purpose:** Verify manifest is not loaded during activation
+- **Success Criteria:**
+  - Activation time < 500ms (manifest not loaded)
+  - First browse command loads manifest
+  - Second browse command uses cached manifest (faster)
+
+### 6. Statistical Analysis
+- **Test:** `Statistics: Activation time statistics across multiple runs`
+- **Purpose:** Measure consistency and reliability
+- **Success Criteria:**
+  - Average activation time < 500ms
+  - Standard deviation < 200ms (consistent performance)
+
+### 7. Concurrent Operations
+- **Test:** `Concurrent Operations: Activation should handle concurrent file operations`
+- **Purpose:** Test activation under concurrent file system load
+- **Success Criteria:** Activation completes in under 1000ms with concurrent operations
+
+## Implementation Details
+
+### Test File Location
+`src/test/suite/activation-performance.test.ts`
+
+### Key Test Helpers
+
+#### `measureActivationTime()`
+Measures the time taken to activate the extension:
+```typescript
+async function measureActivationTime(): Promise<number> {
+  const startTime = Date.now();
+  const extension = vscode.extensions.getExtension('pragmatic-rhino.pragmatic-rhino-suit');
+  if (!extension.isActive) {
+    await extension.activate();
+  }
+  return Date.now() - startTime;
+}
+```
+
+#### `createTestFrameworks(count: number)`
+Creates test framework files and metadata:
+```typescript
+async function createTestFrameworks(count: number): Promise<void> {
+  // Creates framework files in .kiro/steering/
+  // Updates installed-frameworks.json metadata
+}
+```
+
+#### `corruptMetadata()`
+Creates invalid metadata to test error handling:
+```typescript
+async function corruptMetadata(): Promise<void> {
+  // Writes invalid JSON to installed-frameworks.json
+}
+```
+
+#### `getMemoryUsage()`
+Captures memory usage metrics:
+```typescript
+function getMemoryUsage(): { heapUsed: number; heapTotal: number; external: number } {
+  const usage = process.memoryUsage();
+  return {
+    heapUsed: Math.round(usage.heapUsed / 1024 / 1024), // MB
+    heapTotal: Math.round(usage.heapTotal / 1024 / 1024), // MB
+    external: Math.round(usage.external / 1024 / 1024) // MB
+  };
+}
+```
+
+## Performance Optimization Strategies
 
 ### 1. Lazy Loading
+- Framework manifest is NOT loaded during activation
+- Manifest loads on first use (browse frameworks command)
+- Subsequent uses leverage in-memory cache
 
-**Framework Manifest:**
-- Manifest is loaded only when first needed
-- Cached in memory after first load
-- No disk I/O on subsequent accesses
+### 2. Efficient File System Operations
+- Minimal file system access during activation
+- Batch operations where possible
+- Use async/await for non-blocking I/O
 
-**Metadata:**
-- Installed frameworks metadata is cached for 5 seconds
-- Reduces file system reads during rapid operations
-- Cache is invalidated on writes
+### 3. Memory Management
+- Cache frequently accessed data
+- Avoid loading large files into memory unnecessarily
+- Use streams for large file operations
 
-### 2. Caching
+### 4. Graceful Degradation
+- Extension activates even with corrupted metadata
+- Errors are logged but don't block activation
+- User can still use extension features
 
-**Manifest Cache:**
-```typescript
-private manifestCache: FrameworkManifest | null = null;
-```
-- Loaded once per extension session
-- Never expires (manifest is bundled with extension)
-- Cleared only on extension reload
+## Running Performance Tests
 
-**Metadata Cache:**
-```typescript
-private metadataCache: InstalledFrameworksMetadata | null = null;
-private metadataCacheTime: number = 0;
-private readonly METADATA_CACHE_TTL = 5000; // 5 seconds
-```
-- Time-based expiration (5 seconds)
-- Invalidated on writes
-- Reduces file system reads
+### Prerequisites
+- VS Code Extension Development Host
+- Test workspace with `.kiro/` directory
 
-### 3. Debouncing
-
-**File System Watcher:**
-```typescript
-let refreshTimeout: NodeJS.Timeout | undefined;
-const debouncedRefresh = () => {
-  if (refreshTimeout) {
-    clearTimeout(refreshTimeout);
-  }
-  refreshTimeout = setTimeout(() => {
-    steeringTreeProvider.refresh();
-  }, 500); // 500ms debounce
-};
-```
-- Prevents excessive tree view refreshes
-- Batches multiple file changes into single refresh
-- 500ms debounce window
-
-### 4. Async Operations
-
-**All I/O is Async:**
-- File system operations use async/await
-- No blocking operations during activation
-- Framework update checks run in background
-
-**Parallel Operations:**
-- Multiple framework installations can run in parallel
-- Tree view updates don't block command execution
-
-### 5. Efficient Data Structures
-
-**Framework Lookup:**
-- O(n) search through frameworks array
-- Acceptable for small number of frameworks (8)
-- Could be optimized to Map if framework count grows
-
-**Metadata Lookup:**
-- O(n) search through installed frameworks
-- Acceptable for typical usage (< 10 installed)
-
-## Performance Monitoring
-
-### Activation Time
-
-Extension logs activation time on startup:
-```
-Pragmatic Rhino SUIT activated in 234ms
-```
-
-If activation exceeds 500ms, a warning is logged:
-```
-Activation time exceeded target: 678ms > 500ms
-```
-
-### Profiling
-
-To profile extension performance:
-
-1. **Enable VS Code Performance Profiling:**
-   - Help > Toggle Developer Tools
-   - Performance tab
-   - Record during extension activation
-
-2. **Check Extension Host Log:**
-   - View > Output > Extension Host
-   - Look for activation time logs
-
-3. **Use VS Code Profiler:**
-   ```bash
-   code --inspect-extensions=9229
-   ```
-   - Open chrome://inspect
-   - Profile extension activation
-
-## Optimization Checklist
-
-### Before Release
-- [ ] Activation time < 500ms
-- [ ] No synchronous file I/O in activation
-- [ ] All caches working correctly
-- [ ] File system watcher debounced
-- [ ] No memory leaks in long-running sessions
-
-### During Development
-- [ ] Profile new features for performance impact
-- [ ] Add caching for frequently accessed data
-- [ ] Use async/await for all I/O
-- [ ] Debounce event handlers
-- [ ] Minimize extension bundle size
-
-## Known Performance Issues
-
-### None Currently
-
-All performance targets are being met.
-
-## Future Optimizations
-
-### 1. Virtual Tree View
-If framework count grows significantly (> 100), consider:
-- Virtual scrolling for tree view
-- Lazy loading of tree nodes
-- Pagination for framework browser
-
-### 2. Incremental Validation
-For large steering documents:
-- Validate only changed sections
-- Cache validation results
-- Debounce validation on typing
-
-### 3. Background Indexing
-For framework search:
-- Build search index in background
-- Use full-text search library (e.g., Fuse.js)
-- Cache search results
-
-### 4. Web Workers
-For CPU-intensive operations:
-- Move validation to web worker
-- Parse large markdown files in background
-- Generate diagrams asynchronously
-
-## Benchmarking
-
-### Running Benchmarks
-
+### Commands
 ```bash
-# Run performance tests
-npm run test:performance
+# Compile tests
+npm run compile-tests
 
-# Profile activation
-npm run profile:activation
+# Run all tests (includes performance tests)
+npm run test:integration
 
-# Measure bundle size
-npm run analyze:bundle
+# Run specific performance test suite
+npm test -- --grep "Extension Activation Performance"
 ```
 
-### Benchmark Results
+### Test Execution Time
+- Full suite: ~5-10 minutes (includes stress tests)
+- Individual tests: 10-60 seconds each
+- Stress tests (100 frameworks): ~2 minutes
 
-**Extension Activation (100 runs):**
-- Mean: 234ms
-- Median: 220ms
-- P95: 280ms
-- P99: 320ms
+## Monitoring in Production
 
-**Framework Installation (100 runs):**
-- Mean: 456ms
-- Median: 440ms
-- P95: 520ms
-- P99: 580ms
+### Metrics to Track
+1. **Activation Time**: Time from extension load to ready state
+2. **Memory Usage**: Heap size after activation
+3. **Framework Count**: Number of installed frameworks
+4. **Error Rate**: Activation failures or errors
 
-**Tree View Refresh (100 runs):**
-- Mean: 98ms
-- Median: 95ms
-- P95: 120ms
-- P99: 140ms
+### Telemetry Points
+- Extension activation start/end
+- Framework manifest load time
+- Tree view initialization time
+- Command registration time
 
-## Memory Usage
+### Performance Alerts
+- Activation time > 1000ms (warning)
+- Activation time > 2000ms (critical)
+- Memory increase > 100MB (warning)
+- Activation failure (critical)
 
-**Baseline (Extension Loaded):**
-- Heap: ~15 MB
-- External: ~2 MB
+## Continuous Improvement
 
-**After Installing 8 Frameworks:**
-- Heap: ~18 MB
-- External: ~2 MB
-- Delta: +3 MB
+### Performance Regression Testing
+- Run performance tests in CI/CD pipeline
+- Compare results against baseline
+- Fail build if performance degrades > 20%
 
-**After 1 Hour of Usage:**
-- Heap: ~20 MB
-- External: ~2 MB
-- No memory leaks detected
+### Profiling Tools
+- VS Code Extension Profiler
+- Node.js built-in profiler
+- Chrome DevTools (for webviews)
 
-## Bundle Size
+### Optimization Opportunities
+1. Further optimize manifest parsing
+2. Implement incremental tree view updates
+3. Add worker threads for CPU-intensive operations
+4. Optimize file system watchers
 
-**Current:**
-- Extension: ~150 KB (minified)
-- Resources: ~200 KB (framework files)
-- Total: ~350 KB
+## Results Summary
 
-**Target:**
-- Keep under 500 KB total
-- Minimize dependencies
-- Tree-shake unused code
+### Test Status
+✅ All performance tests implemented and passing
+✅ Baseline activation < 500ms
+✅ Scalability tests (10, 50, 100 frameworks) passing
+✅ Memory usage within acceptable limits
+✅ Lazy loading verified
+✅ Graceful degradation confirmed
+✅ Concurrent operations handled correctly
 
-## Recommendations
+### Key Findings
+- Extension activates quickly even with many frameworks
+- Lazy loading strategy is effective
+- Memory usage scales linearly with framework count
+- Graceful degradation works as expected
+- Performance is consistent across multiple runs
 
-1. **Keep activation fast** - Target < 500ms
-2. **Cache aggressively** - Reduce file system I/O
-3. **Debounce events** - Prevent excessive updates
-4. **Use async/await** - Never block the UI
-5. **Profile regularly** - Catch regressions early
-6. **Monitor bundle size** - Keep extension lightweight
+### Recommendations
+1. Continue monitoring activation time in production
+2. Set up automated performance regression testing
+3. Consider further optimizations if framework count exceeds 100
+4. Implement telemetry to track real-world performance
 
-## Resources
-
-- [VS Code Extension Performance](https://code.visualstudio.com/api/advanced-topics/extension-host)
-- [Node.js Performance Best Practices](https://nodejs.org/en/docs/guides/simple-profiling/)
-- [Chrome DevTools Profiling](https://developer.chrome.com/docs/devtools/performance/)
+## References
+- [VS Code Extension Performance Best Practices](https://code.visualstudio.com/api/advanced-topics/extension-performance)
+- [Node.js Performance Measurement APIs](https://nodejs.org/api/perf_hooks.html)
+- [VS Code Extension Testing Guide](https://code.visualstudio.com/api/working-with-extensions/testing-extension)
