@@ -1,13 +1,16 @@
-# Agentic Reviewer
+# Pragmatic Rhino SUIT
+## Standards-Unified Integration Toolkit
 
+> **SUIT Up. Standardize. Ship It.**
+> 
 > Framework-based guidance for Amazon Kiro
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/pragmaticrhino/agentic-reviewer)
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/pliekhus77/pr-suit-for-kiro)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ## Overview
 
-Agentic Reviewer is a VS Code extension that provides a curated library of framework-based steering documents to guide Kiro's behavior. Install proven frameworks (TDD/BDD, SABSA Security, C4 Model, Azure, DevOps, etc.) with a single command to ensure your Kiro projects follow best practices from day one.
+Pragmatic Rhino SUIT (Standards-Unified Integration Toolkit) is a VS Code extension that provides a curated library of framework-based steering documents to guide Kiro's behavior. Install proven frameworks (TDD/BDD, SABSA Security, C4 Model, Azure, DevOps, etc.) with a single command to ensure your Kiro projects follow best practices from day one.
 
 Think of it as a package manager for Kiro guidance - browse, install, update, and manage framework steering documents that shape how Kiro creates specs, designs architectures, and implements features.
 
@@ -57,14 +60,14 @@ Create team-specific steering documents with templates and validation support.
 
 1. **Open your Kiro workspace** (contains `.kiro/` directory)
 2. **Open Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-3. **Run** `Agentic Reviewer: Browse Frameworks`
+3. **Run** `Pragmatic Rhino SUIT: Browse Frameworks`
 4. **Select frameworks** to install (or choose "Install Recommended")
 5. **Start using Kiro** - it will now follow the installed framework guidance
 
 ### For New Projects
 
 1. **Open Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-2. **Run** `Agentic Reviewer: Initialize Workspace`
+2. **Run** `Pragmatic Rhino SUIT: Initialize Workspace`
 3. **Choose** to install recommended frameworks or browse the library
 4. **Start building** with best practices from day one
 
@@ -93,7 +96,7 @@ code my-project/
 
 This extension contributes the following settings:
 
-* `agenticReviewer.autoCheckUpdates`: Automatically check for framework updates on startup (default: true)
+* `pragmaticRhinoSuit.autoCheckUpdates`: Automatically check for framework updates on startup (default: true)
 
 ## 📋 Commands
 
@@ -209,8 +212,8 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 
 ```bash
 # Clone the repository
-git clone https://github.com/pragmaticrhino/agentic-reviewer.git
-cd agentic-reviewer
+git clone https://github.com/pliekhus77/pr-suit-for-kiro.git
+cd pr-suit-for-kiro
 
 # Install dependencies
 npm install
@@ -254,7 +257,7 @@ vsce package
 
 **Problem**: Extension doesn't appear in Command Palette
 
-**Solution**: Ensure your workspace contains a `.kiro/` directory, or use "Initialize Workspace" command
+**Solution**: Ensure your workspace contains a `.kiro/` directory, or use "Pragmatic Rhino SUIT: Initialize Workspace" command
 
 ### Frameworks Not Installing
 
@@ -279,7 +282,7 @@ vsce package
 **Problem**: Extension doesn't notify about updates
 
 **Solution**:
-1. Check that `agenticReviewer.autoCheckUpdates` is enabled
+1. Check that `pragmaticRhinoSuit.autoCheckUpdates` is enabled
 2. Manually run "Update All Frameworks" command
 3. Verify internet connection (if checking remote versions)
 
@@ -300,6 +303,6 @@ MIT
 
 ## Links
 
-- **GitHub Repository**: https://github.com/pragmaticrhino/agentic-reviewer
-- **Issues**: https://github.com/pragmaticrhino/agentic-reviewer/issues
+- **GitHub Repository**: https://github.com/pliekhus77/pr-suit-for-kiro
+- **Issues**: https://github.com/pliekhus77/pr-suit-for-kiro/issues
 - **Kiro Documentation**: https://docs.aws.amazon.com/kiro/

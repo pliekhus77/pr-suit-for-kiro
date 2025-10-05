@@ -2,10 +2,12 @@
 inclusion: always
 ---
 
-# Product Context: Agentic Reviewer
+# Product Context: Pragmatic Rhino SUIT
+## Standards-Unified Integration Toolkit
 
 **Company:** Pragmatic Rhino  
-**Author:** Patrick Liekhus
+**Author:** Patrick Liekhus  
+**Tagline:** SUIT Up. Standardize. Ship It.
 
 ## Mission
 Accelerate Amazon Kiro adoption through a VS Code extension that guides developers in applying framework-based best practices and standardized patterns. Future: Complement with .NET NuGet libraries for runtime patterns.
@@ -58,7 +60,7 @@ When implementing features, consult these frameworks in `frameworks/`:
 
 ## Extension Development Rules
 
-**Naming:** `agentic-reviewer` (VS Code extension ID: `pragmatic-rhino.agentic-reviewer`)  
+**Naming:** `pragmatic-rhino-suit` (VS Code extension ID: `pragmatic-rhino.pragmatic-rhino-suit`)  
 **Versioning:** Semantic versioning (MAJOR.MINOR.PATCH)  
 **Target:** VS Code 1.85.0+, Node.js 18+, TypeScript 5.0+  
 **Documentation:** README with feature overview, CHANGELOG for releases  
@@ -156,7 +158,7 @@ When implementing features, consult these frameworks in `frameworks/`:
 5. Test commands in command palette (Ctrl+Shift+P)
 
 **New Feature Workflow (Using Extension):**
-1. Open command palette: "Agentic Reviewer: Create New Spec"
+1. Open command palette: "Pragmatic Rhino SUIT: Create New Spec"
 2. Enter feature name, select templates
 3. Extension scaffolds all four files (requirements, design, tasks, testing-plan)
 4. Fill in templates with guidance from inline suggestions

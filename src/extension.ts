@@ -18,10 +18,10 @@ import { SteeringItem } from './models/steering';
  */
 export function activate(context: vscode.ExtensionContext): { context: vscode.ExtensionContext } {
   const activationStart = Date.now();
-  console.log('Agentic Reviewer extension is now active');
+  console.log('Pragmatic Rhino SUIT extension is now active - SUIT Up. Standardize. Ship It.');
 
   // Set context for conditional UI elements
-  vscode.commands.executeCommand('setContext', 'agenticReviewer.activated', true);
+  vscode.commands.executeCommand('setContext', 'pragmaticRhinoSuit.activated', true);
 
   // Initialize services
   const fileSystem = new FileSystemOperations();
@@ -31,7 +31,7 @@ export function activate(context: vscode.ExtensionContext): { context: vscode.Ex
   const steeringTreeProvider = new SteeringTreeProvider(fileSystem, frameworkManager);
 
   // Create diagnostic collection for validation issues
-  const diagnosticCollection = vscode.languages.createDiagnosticCollection('agentic-reviewer');
+  const diagnosticCollection = vscode.languages.createDiagnosticCollection('pragmatic-rhino-suit');
   context.subscriptions.push(diagnosticCollection);
 
   // Register commands
@@ -253,7 +253,7 @@ function registerTreeViews(
   fileSystem: FileSystemOperations
 ): void {
   // Register steering tree view
-  const treeView = vscode.window.createTreeView('agenticReviewer.steeringTree', {
+  const treeView = vscode.window.createTreeView('pragmaticRhinoSuit.steeringTree', {
     treeDataProvider: steeringTreeProvider,
     showCollapseAll: true
   });
@@ -335,7 +335,7 @@ function showWelcomeMessage(context: vscode.ExtensionContext): void {
   
   if (!hasShownWelcome) {
     vscode.window.showInformationMessage(
-      'Welcome to Agentic Reviewer! Use "Browse Frameworks" to get started.',
+      'Welcome to Pragmatic Rhino SUIT! SUIT Up. Standardize. Ship It. Use "Browse Frameworks" to get started.',
       'Browse Frameworks',
       'Dismiss'
     ).then(selection => {

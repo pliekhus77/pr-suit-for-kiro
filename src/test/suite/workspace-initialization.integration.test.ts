@@ -15,7 +15,7 @@ suite('Workspace Initialization Integration Tests', () => {
 
   suiteSetup(async () => {
     // Get the extension context
-    const extension = vscode.extensions.getExtension('pragmatic-rhino.agentic-reviewer');
+    const extension = vscode.extensions.getExtension('pragmatic-rhino.pragmatic-rhino-suit');
     assert.ok(extension, 'Extension should be available');
     
     if (!extension.isActive) {

@@ -89,7 +89,7 @@ const debouncedRefresh = () => {
 
 Extension logs activation time on startup:
 ```
-Agentic Reviewer activated in 234ms
+Pragmatic Rhino SUIT activated in 234ms
 ```
 
 If activation exceeds 500ms, a warning is logged:

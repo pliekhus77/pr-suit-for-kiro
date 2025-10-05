@@ -13,7 +13,7 @@ The design follows VS Code extension best practices with a clear separation betw
 ```mermaid
 graph TB
     Developer[Developer<br/>Uses extension to manage frameworks]
-    Extension[Agentic Reviewer Extension<br/>VS Code Extension]
+    Extension[Pragmatic Rhino SUIT Extension<br/>VS Code Extension]
     Kiro[Kiro IDE<br/>Reads steering documents]
     FileSystem[File System<br/>.kiro/steering/ directory]
     Library[Framework Library<br/>Bundled steering documents]
@@ -709,9 +709,9 @@ suite('Extension Integration Tests', () => {
 
 ```json
 {
-  "name": "agentic-reviewer",
-  "displayName": "Agentic Reviewer",
-  "description": "Framework-based guidance for Amazon Kiro",
+  "name": "pragmatic-rhino-suit",
+  "displayName": "Pragmatic Rhino SUIT",
+  "description": "Standards-Unified Integration Toolkit - SUIT Up. Standardize. Ship It.",
   "version": "0.1.0",
   "publisher": "pragmatic-rhino",
   "engines": {

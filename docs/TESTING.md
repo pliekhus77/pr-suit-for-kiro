@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the testing strategy and provides manual testing checklists for the Agentic Reviewer extension.
+This document describes the testing strategy and provides manual testing checklists for the Pragmatic Rhino SUIT extension.
 
 ## Test Pyramid
 
@@ -152,7 +152,7 @@ Complete this checklist before each release:
 #### 2. Framework Browsing
 
 - [ ] Open Command Palette (`Ctrl+Shift+P`)
-- [ ] Run "Agentic Reviewer: Browse Frameworks"
+- [ ] Run "Pragmatic Rhino SUIT: Browse Frameworks"
 - [ ] All 8 frameworks appear in quick pick
 - [ ] Frameworks are grouped by category
 - [ ] Framework descriptions are clear

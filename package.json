@@ -1,14 +1,14 @@
 {
-  "name": "agentic-reviewer",
-  "displayName": "Agentic Reviewer",
-  "description": "Framework-based guidance for Amazon Kiro",
+  "name": "pragmatic-rhino-suit",
+  "displayName": "Pragmatic Rhino SUIT",
+  "description": "Standards-Unified Integration Toolkit - SUIT Up. Standardize. Ship It.",
   "version": "0.1.0",
   "publisher": "pragmatic-rhino",
   "author": "Patrick Liekhus",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pragmatic-rhino/agentic-reviewer"
+    "url": "https://github.com/pliekhus77/pr-suit-for-kiro"
   },
   "engines": {
     "vscode": "^1.85.0"
@@ -35,111 +35,111 @@
       {
         "command": "agentic-reviewer.browseFrameworks",
         "title": "Browse Frameworks",
-        "category": "Agentic Reviewer",
+        "category": "Pragmatic Rhino SUIT",
         "icon": "$(library)"
       },
       {
         "command": "agentic-reviewer.installFramework",
         "title": "Install Framework",
-        "category": "Agentic Reviewer",
+        "category": "Pragmatic Rhino SUIT",
         "icon": "$(cloud-download)"
       },
       {
         "command": "agentic-reviewer.updateFramework",
         "title": "Update Framework",
-        "category": "Agentic Reviewer",
+        "category": "Pragmatic Rhino SUIT",
         "icon": "$(sync)"
       },
       {
         "command": "agentic-reviewer.updateAllFrameworks",
         "title": "Update All Frameworks",
-        "category": "Agentic Reviewer",
+        "category": "Pragmatic Rhino SUIT",
         "icon": "$(sync-ignored)"
       },
       {
         "command": "agentic-reviewer.removeFramework",
         "title": "Remove Framework",
-        "category": "Agentic Reviewer",
+        "category": "Pragmatic Rhino SUIT",
         "icon": "$(trash)"
       },
       {
         "command": "agentic-reviewer.createCustomSteering",
         "title": "Create Custom Steering",
-        "category": "Agentic Reviewer",
+        "category": "Pragmatic Rhino SUIT",
         "icon": "$(new-file)"
       },
       {
         "command": "agentic-reviewer.validateSteering",
         "title": "Validate Steering Document",
-        "category": "Agentic Reviewer",
+        "category": "Pragmatic Rhino SUIT",
         "icon": "$(check)"
       },
       {
         "command": "agentic-reviewer.renameCustomSteering",
         "title": "Rename",
-        "category": "Agentic Reviewer"
+        "category": "Pragmatic Rhino SUIT"
       },
       {
         "command": "agentic-reviewer.deleteCustomSteering",
         "title": "Delete",
-        "category": "Agentic Reviewer"
+        "category": "Pragmatic Rhino SUIT"
       },
       {
         "command": "agentic-reviewer.exportCustomSteering",
         "title": "Export to Library",
-        "category": "Agentic Reviewer"
+        "category": "Pragmatic Rhino SUIT"
       },
       {
         "command": "agentic-reviewer.initializeWorkspace",
         "title": "Initialize Workspace",
-        "category": "Agentic Reviewer",
+        "category": "Pragmatic Rhino SUIT",
         "icon": "$(folder-opened)"
       },
       {
         "command": "agentic-reviewer.searchFrameworks",
         "title": "Search Frameworks",
-        "category": "Agentic Reviewer",
+        "category": "Pragmatic Rhino SUIT",
         "icon": "$(search)"
       },
       {
         "command": "agentic-reviewer.viewFrameworkReference",
         "title": "View Framework Reference",
-        "category": "Agentic Reviewer"
+        "category": "Pragmatic Rhino SUIT"
       },
       {
         "command": "agentic-reviewer.initializeFrameworksDirectory",
         "title": "Initialize Frameworks Directory",
-        "category": "Agentic Reviewer"
+        "category": "Pragmatic Rhino SUIT"
       },
       {
         "command": "agentic-reviewer.refreshSteeringTree",
         "title": "Refresh",
-        "category": "Agentic Reviewer",
+        "category": "Pragmatic Rhino SUIT",
         "icon": "$(refresh)"
       },
       {
         "command": "agentic-reviewer.openSteeringDocument",
         "title": "Open",
-        "category": "Agentic Reviewer"
+        "category": "Pragmatic Rhino SUIT"
       },
       {
         "command": "agentic-reviewer.revealSteeringDocument",
         "title": "Reveal in File Explorer",
-        "category": "Agentic Reviewer"
+        "category": "Pragmatic Rhino SUIT"
       }
     ],
     "views": {
       "explorer": [
         {
-          "id": "agenticReviewer.steeringTree",
+          "id": "pragmaticRhinoSuit.steeringTree",
           "name": "Framework Steering",
-          "when": "agenticReviewer.activated"
+          "when": "pragmaticRhinoSuit.activated"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "agenticReviewer.steeringTree",
+        "view": "pragmaticRhinoSuit.steeringTree",
         "contents": "No framework steering documents found.\n[Browse Frameworks](command:agentic-reviewer.browseFrameworks)\n[Initialize Workspace](command:agentic-reviewer.initializeWorkspace)"
       }
     ],
@@ -147,44 +147,44 @@
       "view/title": [
         {
           "command": "agentic-reviewer.refreshSteeringTree",
-          "when": "view == agenticReviewer.steeringTree",
+          "when": "view == pragmaticRhinoSuit.steeringTree",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "agentic-reviewer.openSteeringDocument",
-          "when": "view == agenticReviewer.steeringTree && viewItem =~ /^steering(Strategy|Project|Custom)$/",
+          "when": "view == pragmaticRhinoSuit.steeringTree && viewItem =~ /^steering(Strategy|Project|Custom)$/",
           "group": "navigation@1"
         },
         {
           "command": "agentic-reviewer.revealSteeringDocument",
-          "when": "view == agenticReviewer.steeringTree && viewItem =~ /^steering(Strategy|Project|Custom)$/",
+          "when": "view == pragmaticRhinoSuit.steeringTree && viewItem =~ /^steering(Strategy|Project|Custom)$/",
           "group": "navigation@2"
         },
         {
           "command": "agentic-reviewer.updateFramework",
-          "when": "view == agenticReviewer.steeringTree && viewItem == steeringStrategy",
+          "when": "view == pragmaticRhinoSuit.steeringTree && viewItem == steeringStrategy",
           "group": "framework@1"
         },
         {
           "command": "agentic-reviewer.removeFramework",
-          "when": "view == agenticReviewer.steeringTree && viewItem == steeringStrategy",
+          "when": "view == pragmaticRhinoSuit.steeringTree && viewItem == steeringStrategy",
           "group": "framework@2"
         },
         {
           "command": "agentic-reviewer.renameCustomSteering",
-          "when": "view == agenticReviewer.steeringTree && viewItem == steeringCustom",
+          "when": "view == pragmaticRhinoSuit.steeringTree && viewItem == steeringCustom",
           "group": "custom@1"
         },
         {
           "command": "agentic-reviewer.deleteCustomSteering",
-          "when": "view == agenticReviewer.steeringTree && viewItem == steeringCustom",
+          "when": "view == pragmaticRhinoSuit.steeringTree && viewItem == steeringCustom",
           "group": "custom@2"
         },
         {
           "command": "agentic-reviewer.exportCustomSteering",
-          "when": "view == agenticReviewer.steeringTree && viewItem == steeringCustom",
+          "when": "view == pragmaticRhinoSuit.steeringTree && viewItem == steeringCustom",
           "group": "custom@3"
         }
       ],

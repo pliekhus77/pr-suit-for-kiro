@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The Framework Steering Management feature enables developers to easily install, manage, and customize framework-based steering documents that guide Kiro's behavior. This feature is foundational to the Agentic Reviewer extension, as it provides the mechanism for teams to adopt proven frameworks (DDD, TDD/BDD, C4 Model, SABSA, etc.) in their Kiro workflows.
+The Framework Steering Management feature enables developers to easily install, manage, and customize framework-based steering documents that guide Kiro's behavior. This feature is foundational to the Pragmatic Rhino SUIT extension, as it provides the mechanism for teams to adopt proven frameworks (DDD, TDD/BDD, C4 Model, SABSA, etc.) in their Kiro workflows.
 
 Kiro already handles spec creation, task management, and workflow execution. However, developers currently must manually create and maintain steering documents in `.kiro/steering/` to influence Kiro's behavior. This feature provides a curated library of framework-based steering documents that can be installed with a single command, customized for team needs, and kept up-to-date as frameworks evolve.
 
@@ -14,7 +14,7 @@ Kiro already handles spec creation, task management, and workflow execution. How
 
 #### Acceptance Criteria
 
-1. WHEN the user executes "Agentic Reviewer: Browse Frameworks" command THEN the system SHALL display a quick pick list of available frameworks
+1. WHEN the user executes "Pragmatic Rhino SUIT: Browse Frameworks" command THEN the system SHALL display a quick pick list of available frameworks
 2. WHEN the framework list is shown THEN it SHALL include categories: Architecture (C4 Model, DDD), Testing (TDD/BDD), Security (SABSA), DevOps, Cloud (Azure, AWS), Work Management (4D SDLC + SAFe)
 3. WHEN a framework is selected THEN the system SHALL show a preview of the steering document with description and key concepts
 4. WHEN viewing a framework preview THEN the system SHALL show options: "Install", "View Full Documentation", "Cancel"
@@ -70,7 +70,7 @@ Kiro already handles spec creation, task management, and workflow execution. How
 
 #### Acceptance Criteria
 
-1. WHEN the user executes "Agentic Reviewer: Create Custom Steering" command THEN the system SHALL prompt for a document name
+1. WHEN the user executes "Pragmatic Rhino SUIT: Create Custom Steering" command THEN the system SHALL prompt for a document name
 2. WHEN a name is provided THEN the system SHALL validate it follows kebab-case format
 3. WHEN a valid name is provided THEN the system SHALL create a new markdown file in `.kiro/steering/` with a basic template
 4. WHEN the template is created THEN it SHALL include sections: Purpose, Key Concepts, Best Practices, Anti-Patterns, Summary
@@ -84,7 +84,7 @@ Kiro already handles spec creation, task management, and workflow execution. How
 
 #### Acceptance Criteria
 
-1. WHEN the user executes "Agentic Reviewer: Validate Steering Document" command THEN the system SHALL check the current document for required sections
+1. WHEN the user executes "Pragmatic Rhino SUIT: Validate Steering Document" command THEN the system SHALL check the current document for required sections
 2. WHEN validation runs THEN it SHALL verify the document has a clear Purpose section
 3. WHEN validation runs THEN it SHALL check for actionable guidance (not just theory)
 4. WHEN validation runs THEN it SHALL verify examples are provided for key concepts
@@ -103,7 +103,7 @@ Kiro already handles spec creation, task management, and workflow execution. How
 2. WHEN "View Framework Reference" is clicked THEN the system SHALL open the corresponding document from `frameworks/` directory
 3. WHEN the `frameworks/` directory does not exist THEN the system SHALL offer to initialize it with default framework docs
 4. WHEN hovering over framework-specific terms in steering documents THEN the system SHALL show tooltips with definitions
-5. WHEN the user executes "Agentic Reviewer: Search Frameworks" command THEN the system SHALL provide full-text search across all framework references
+5. WHEN the user executes "Pragmatic Rhino SUIT: Search Frameworks" command THEN the system SHALL provide full-text search across all framework references
 6. WHEN search results are shown THEN clicking a result SHALL open the framework document at the relevant section
 
 ### Requirement 8: Workspace Initialization
@@ -112,7 +112,7 @@ Kiro already handles spec creation, task management, and workflow execution. How
 
 #### Acceptance Criteria
 
-1. WHEN the user executes "Agentic Reviewer: Initialize Workspace" command in a non-Kiro workspace THEN the system SHALL create `.kiro/` directory structure
+1. WHEN the user executes "Pragmatic Rhino SUIT: Initialize Workspace" command in a non-Kiro workspace THEN the system SHALL create `.kiro/` directory structure
 2. WHEN initializing THEN the system SHALL create directories: `.kiro/steering/`, `.kiro/specs/`, `.kiro/settings/`, `frameworks/`
 3. WHEN directories are created THEN the system SHALL prompt: "Install recommended frameworks?"
 4. WHEN "Yes" is selected THEN the system SHALL install recommended strategy files: strategy-tdd-bdd.md, strategy-c4-model.md, strategy-devops.md, strategy-4d-safe.md

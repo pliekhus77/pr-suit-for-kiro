@@ -1,6 +1,8 @@
-# Contributing to Agentic Reviewer
+# Contributing to Pragmatic Rhino SUIT
 
-Thank you for your interest in contributing to Agentic Reviewer! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to Pragmatic Rhino SUIT (Standards-Unified Integration Toolkit)! This document provides guidelines and instructions for contributing.
+
+**SUIT Up. Standardize. Ship It.**
 
 ## Code of Conduct
 
@@ -11,7 +13,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 ### Reporting Bugs
 
 Before creating a bug report:
-1. Check the [existing issues](https://github.com/pragmaticrhino/agentic-reviewer/issues) to avoid duplicates
+1. Check the [existing issues](https://github.com/pliekhus77/pr-suit-for-kiro/issues) to avoid duplicates
 2. Gather information about the bug (steps to reproduce, expected vs actual behavior, screenshots)
 
 When creating a bug report, include:
@@ -37,8 +39,8 @@ Feature requests are welcome! When suggesting a feature:
 
 1. **Fork the repository**
    ```bash
-   git clone https://github.com/YOUR-USERNAME/agentic-reviewer.git
-   cd agentic-reviewer
+   git clone https://github.com/YOUR-USERNAME/pr-suit-for-kiro.git
+   cd pr-suit-for-kiro
    ```
 
 2. **Install dependencies**
@@ -255,7 +257,7 @@ vsce package
 ## Project Structure
 
 ```
-agentic-reviewer/
+pr-suit-for-kiro/
 ├── .kiro/                    # Kiro configuration
 │   ├── steering/             # Steering documents
 │   └── specs/                # Feature specs
@@ -285,8 +287,8 @@ agentic-reviewer/
 
 ## Getting Help
 
-- **Questions**: Open a [GitHub Discussion](https://github.com/pragmaticrhino/agentic-reviewer/discussions)
-- **Bugs**: Open a [GitHub Issue](https://github.com/pragmaticrhino/agentic-reviewer/issues)
+- **Questions**: Open a [GitHub Discussion](https://github.com/pliekhus77/pr-suit-for-kiro/discussions)
+- **Bugs**: Open a [GitHub Issue](https://github.com/pliekhus77/pr-suit-for-kiro/issues)
 - **Chat**: Join our [Discord server](https://discord.gg/pragmaticrhino) (coming soon)
 
 ## Recognition
@@ -296,4 +298,4 @@ Contributors will be recognized in:
 - README.md contributors section
 - GitHub contributors page
 
-Thank you for contributing to Agentic Reviewer! 🎉
+Thank you for contributing to Pragmatic Rhino SUIT! 🎉

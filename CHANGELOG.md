@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the "Agentic Reviewer" extension will be documented in this file.
+All notable changes to the "Pragmatic Rhino SUIT" extension will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -164,8 +164,8 @@ We will follow semantic versioning:
 ## Support
 
 For issues, questions, or feature requests:
-- **GitHub Issues**: https://github.com/pragmaticrhino/agentic-reviewer/issues
-- **Discussions**: https://github.com/pragmaticrhino/agentic-reviewer/discussions
+- **GitHub Issues**: https://github.com/pliekhus77/pr-suit-for-kiro/issues
+- **Discussions**: https://github.com/pliekhus77/pr-suit-for-kiro/discussions
 - **Email**: support@pragmaticrhino.com
 
 ---

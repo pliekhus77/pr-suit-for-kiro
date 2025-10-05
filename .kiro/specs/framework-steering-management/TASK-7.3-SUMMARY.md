@@ -90,7 +90,7 @@ Added 12 new test cases covering:
 4. Success message displayed
 
 **From Command Palette:**
-1. Execute "Agentic Reviewer: Update Framework"
+1. Execute "Pragmatic Rhino SUIT: Update Framework"
 2. Select framework from quick pick (shows version changes)
 3. Framework updates with progress notification
 4. Success message displayed
@@ -98,7 +98,7 @@ Added 12 new test cases covering:
 ### Update All Frameworks
 
 **From Command Palette:**
-1. Execute "Agentic Reviewer: Update All Frameworks"
+1. Execute "Pragmatic Rhino SUIT: Update All Frameworks"
 2. Review list of frameworks to update in confirmation dialog
 3. Click "Update All" to proceed
 4. Progress notification shows current framework being updated
