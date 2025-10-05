@@ -331,7 +331,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Test mixed heading levels warnings
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8_
   
-  - [ ] 13.4 Unit tests for TemplateEngine
+  - [x] 13.4 Unit tests for TemplateEngine
 
 
     - Test variable substitution with {{feature-name}}, {{date}}, {{author}}
