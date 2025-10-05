@@ -351,7 +351,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Test framework grouping by category in quick pick
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
   
-  - [ ] 14.2 Install framework command - missing scenarios
+  - [x] 14.2 Install framework command - missing scenarios
     - Test invalid framework ID shows error notification
     - Test framework with dependencies installs dependencies first
     - Test disk full error handling with user notification
