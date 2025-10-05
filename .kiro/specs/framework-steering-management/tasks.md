@@ -475,9 +475,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Test operations on network drives with connectivity issues
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
 
-  - [-] 18.2 Boundary condition tests
-
-  - [ ] 18.2 Boundary condition tests
+  - [x] 18.2 Boundary condition tests
     - Test with empty workspace (no files)
     - Test with workspace containing only .kiro/ file (not directory)
     - Test with very long file paths (>260 chars on Windows)
