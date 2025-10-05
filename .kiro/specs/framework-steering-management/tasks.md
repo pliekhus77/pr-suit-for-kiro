@@ -436,7 +436,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Implement steps for recommended frameworks installation
     - _Requirements: 8.1-8.7_
   
-  - [ ] 16.5 Implement search BDD scenarios
+  - [x] 16.5 Implement search BDD scenarios
     - Create feature file: framework-search.feature
     - Implement steps for "Search framework references" scenario
     - _Requirements: 7.1-7.6_

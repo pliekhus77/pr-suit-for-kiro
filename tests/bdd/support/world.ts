@@ -143,6 +143,7 @@ export class KiroWorld extends ExtensionWorld {
   public workspacePath!: string;
   public kiroPath!: string;
   public steeringPath!: string;
+  public frameworksPath!: string;
   
   // Framework management
   public selectedFramework?: { id: string; name: string; fileName: string };
@@ -163,6 +164,26 @@ export class KiroWorld extends ExtensionWorld {
   public existingFileContent?: string;
   public installedFilePath?: string;
   public openedDocument?: vscode.TextDocument;
+  
+  // Search functionality
+  public searchQuery?: string;
+  public searchResults?: Array<{
+    fileName: string;
+    line?: number;
+    column?: number;
+    snippet?: string;
+    section?: string;
+    contextBefore?: string;
+    contextAfter?: string;
+  }>;
+  public pendingCommand?: string;
+  public searchCancelled?: boolean;
+  
+  // Editor and UI
+  public activeEditor?: vscode.TextEditor;
+  public codeLensText?: string;
+  public hoverInfo?: vscode.Hover[];
+  public lastPromptMessage?: string;
   
   constructor(options: IWorldOptions) {
     super(options);
