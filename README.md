@@ -1,6 +1,8 @@
 # Pragmatic Rhino SUIT
 ## Standards-Unified Integration Toolkit
 
+![Pragmatic Rhino SUIT - SUIT Up. Standardize. Ship It.](resources/images/hero-banner.png)
+
 > **SUIT Up. Standardize. Ship It.**
 > 
 > Framework-based guidance for Amazon Kiro
