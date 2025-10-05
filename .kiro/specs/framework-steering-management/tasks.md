@@ -430,7 +430,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Implement steps for "Validate steering document" scenario
     - _Requirements: 5.1-5.7, 6.1-6.8_
   
-  - [ ] 16.4 Implement workspace initialization BDD scenarios
+  - [x] 16.4 Implement workspace initialization BDD scenarios
     - Create feature file: workspace-initialization.feature
     - Implement steps for "Initialize new Kiro workspace" scenario
     - Implement steps for recommended frameworks installation
