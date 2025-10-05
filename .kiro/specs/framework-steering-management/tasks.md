@@ -1,4 +1,4 @@
-# Implementation Plan: Framework Steering Management
+# Implementation Plan: Framework Steering Management 
 
 ## Overview
 
