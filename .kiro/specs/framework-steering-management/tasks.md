@@ -424,7 +424,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Implement steps for "Update customized framework" scenario
     - _Requirements: 1.1-1.6, 2.1-2.7, 3.1-3.7, 4.1-4.8_
   
-  - [ ] 16.3 Implement custom steering BDD scenarios
+  - [x] 16.3 Implement custom steering BDD scenarios
     - Create feature file: custom-steering.feature
     - Implement steps for "Create custom steering document" scenario
     - Implement steps for "Validate steering document" scenario
