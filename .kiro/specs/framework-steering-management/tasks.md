@@ -360,7 +360,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Test concurrent installation attempts
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
   
-  - [ ] 14.3 Update framework command - complete implementation
+  - [x] 14.3 Update framework command - complete implementation
     - Test checkForUpdates() detects outdated frameworks
     - Test updateFramework() updates file content and metadata
     - Test customized framework warning before update
