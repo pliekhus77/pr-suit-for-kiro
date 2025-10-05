@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>PragmaticRhino.Kiro.Steering.C4Model</id>
+    <version>1.0.0</version>
+    <authors>Patrick Liekhus</authors>
+    <owners>Pragmatic Rhino</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/pragmaticrhino/agentic-reviewer</projectUrl>
+    <description>C4 Model architecture documentation strategy for Kiro. Defines when and how to create System Context, Container, Component, and Dynamic diagrams.</description>
+    <tags>kiro steering c4 architecture diagrams best-practices</tags>
+    <readme>README.md</readme>
+    <contentFiles>
+      <files include="**/*" buildAction="Content" copyToOutput="false" flatten="false" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="../../.kiro/steering/strategy-c4-model.md" target="contentFiles/any/any/.kiro/steering/strategy-c4-model.md" />
+    <file src="../readme/C4Model.md" target="README.md" />
+  </files>
+</package>

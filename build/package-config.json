@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "packages": [
+    {
+      "name": "4DSafe",
+      "id": "PragmaticRhino.Kiro.Steering.4DSafe",
+      "sourceFile": "strategy-4d-safe.md",
+      "description": "4D SDLC + SAFe work management strategy guide for Kiro. Includes Define-Design-Develop-Deploy phases, WSJF prioritization, and agile best practices.",
+      "tags": ["kiro", "steering", "agile", "safe", "sdlc", "best-practices"]
+    },
+    {
+      "name": "Azure",
+      "id": "PragmaticRhino.Kiro.Steering.Azure",
+      "sourceFile": "strategy-azure.md",
+      "description": "Azure hosting and architecture strategy guide for Kiro. Covers App Service, Container Apps, AKS, Functions, and Well-Architected principles.",
+      "tags": ["kiro", "steering", "azure", "cloud", "hosting", "best-practices"]
+    },
+    {
+      "name": "C4Model",
+      "id": "PragmaticRhino.Kiro.Steering.C4Model",
+      "sourceFile": "strategy-c4-model.md",
+      "description": "C4 Model architecture documentation strategy for Kiro. Defines when and how to create System Context, Container, Component, and Dynamic diagrams.",
+      "tags": ["kiro", "steering", "c4", "architecture", "diagrams", "best-practices"]
+    },
+    {
+      "name": "DevOps",
+      "id": "PragmaticRhino.Kiro.Steering.DevOps",
+      "sourceFile": "strategy-devops.md",
+      "description": "DevOps CI/CD strategy guide for Kiro. Covers automation, DORA metrics, deployment strategies, and continuous delivery practices.",
+      "tags": ["kiro", "steering", "devops", "cicd", "automation", "best-practices"]
+    },
+    {
+      "name": "EnterpriseArchitecture",
+      "id": "PragmaticRhino.Kiro.Steering.EnterpriseArchitecture",
+      "sourceFile": "strategy-ea.md",
+      "description": "Enterprise Architecture strategy guide for Kiro using TOGAF and Zachman frameworks. Provides strategic questions for product and feature planning.",
+      "tags": ["kiro", "steering", "togaf", "zachman", "enterprise", "best-practices"]
+    },
+    {
+      "name": "InfrastructureAsCode",
+      "id": "PragmaticRhino.Kiro.Steering.InfrastructureAsCode",
+      "sourceFile": "strategy-iac.md",
+      "description": "Infrastructure as Code strategy guide for Kiro using Pulumi. Covers stacks, components, configuration, and IaC best practices.",
+      "tags": ["kiro", "steering", "iac", "pulumi", "infrastructure", "best-practices"]
+    },
+    {
+      "name": "Security",
+      "id": "PragmaticRhino.Kiro.Steering.Security",
+      "sourceFile": "strategy-security.md",
+      "description": "Security strategy guide for Kiro based on SABSA framework. Covers threat modeling, secure coding, compliance, and defense in depth.",
+      "tags": ["kiro", "steering", "security", "sabsa", "compliance", "best-practices"]
+    },
+    {
+      "name": "TestDrivenDevelopment",
+      "id": "PragmaticRhino.Kiro.Steering.TestDrivenDevelopment",
+      "sourceFile": "strategy-tdd-bdd.md",
+      "description": "TDD/BDD testing strategy guide for Kiro. Covers Red-Green-Refactor, Given-When-Then, testing-plan.md, and quality standards.",
+      "tags": ["kiro", "steering", "tdd", "bdd", "testing", "best-practices"]
+    }
+  ]
+}

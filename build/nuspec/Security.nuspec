@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>PragmaticRhino.Kiro.Steering.Security</id>
+    <version>1.0.0</version>
+    <authors>Patrick Liekhus</authors>
+    <owners>Pragmatic Rhino</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/pragmaticrhino/agentic-reviewer</projectUrl>
+    <description>Security strategy guide for Kiro based on SABSA framework. Covers threat modeling, secure coding, compliance, and defense in depth.</description>
+    <tags>kiro steering security sabsa compliance best-practices</tags>
+    <readme>README.md</readme>
+    <contentFiles>
+      <files include="**/*" buildAction="Content" copyToOutput="false" flatten="false" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="../../.kiro/steering/strategy-security.md" target="contentFiles/any/any/.kiro/steering/strategy-security.md" />
+    <file src="../readme/Security.md" target="README.md" />
+  </files>
+</package>

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>PragmaticRhino.Kiro.Steering.EnterpriseArchitecture</id>
+    <version>1.0.0</version>
+    <authors>Patrick Liekhus</authors>
+    <owners>Pragmatic Rhino</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/pragmaticrhino/agentic-reviewer</projectUrl>
+    <description>Enterprise Architecture strategy guide for Kiro using TOGAF and Zachman frameworks. Provides strategic questions for product and feature planning.</description>
+    <tags>kiro steering togaf zachman enterprise best-practices</tags>
+    <readme>README.md</readme>
+    <contentFiles>
+      <files include="**/*" buildAction="Content" copyToOutput="false" flatten="false" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="../../.kiro/steering/strategy-ea.md" target="contentFiles/any/any/.kiro/steering/strategy-ea.md" />
+    <file src="../readme/EnterpriseArchitecture.md" target="README.md" />
+  </files>
+</package>

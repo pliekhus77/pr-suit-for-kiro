@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>PragmaticRhino.Kiro.Steering.All</id>
+    <version>1.0.0</version>
+    <authors>Patrick Liekhus</authors>
+    <owners>Pragmatic Rhino</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/pragmaticrhino/agentic-reviewer</projectUrl>
+    <description>Complete suite of Kiro steering strategy files for .NET projects. Includes all best practice guides for TDD/BDD, DevOps, Security, Azure, IaC, C4 Model, Enterprise Architecture, and 4D SDLC.</description>
+    <tags>kiro steering best-practices complete-suite</tags>
+    <readme>README.md</readme>
+    <dependencies>
+      <dependency id="PragmaticRhino.Kiro.Steering.4DSafe" version="1.0.0" />
+      <dependency id="PragmaticRhino.Kiro.Steering.Azure" version="1.0.0" />
+      <dependency id="PragmaticRhino.Kiro.Steering.C4Model" version="1.0.0" />
+      <dependency id="PragmaticRhino.Kiro.Steering.DevOps" version="1.0.0" />
+      <dependency id="PragmaticRhino.Kiro.Steering.EnterpriseArchitecture" version="1.0.0" />
+      <dependency id="PragmaticRhino.Kiro.Steering.InfrastructureAsCode" version="1.0.0" />
+      <dependency id="PragmaticRhino.Kiro.Steering.Security" version="1.0.0" />
+      <dependency id="PragmaticRhino.Kiro.Steering.TestDrivenDevelopment" version="1.0.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="../readme/All.md" target="README.md" />
+  </files>
+</package>

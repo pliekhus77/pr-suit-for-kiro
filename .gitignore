@@ -1,0 +1,22 @@
+# Build artifacts
+artifacts/
+
+# NuGet packages
+*.nupkg
+
+# Test projects
+test-project/
+test-project-meta/
+
+# VS Code Extension
+node_modules/
+out/
+dist/
+*.vsix
+.vscode-test/
+
+# TypeScript
+*.tsbuildinfo
+
+# Jest
+coverage/

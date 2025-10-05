@@ -1,0 +1,77 @@
+{
+  "version": "1.0.0",
+  "frameworks": [
+    {
+      "id": "tdd-bdd-strategy",
+      "name": "TDD/BDD Testing Strategy",
+      "description": "Test-driven and behavior-driven development practices with testing-plan.md requirements",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": "strategy-tdd-bdd.md",
+      "dependencies": []
+    },
+    {
+      "id": "security-strategy",
+      "name": "SABSA Security Strategy",
+      "description": "Security architecture and threat modeling practices",
+      "category": "security",
+      "version": "1.0.0",
+      "fileName": "strategy-security.md",
+      "dependencies": []
+    },
+    {
+      "id": "c4-model-strategy",
+      "name": "C4 Model Architecture",
+      "description": "When and how to use C4 diagrams in specs",
+      "category": "architecture",
+      "version": "1.0.0",
+      "fileName": "strategy-c4-model.md",
+      "dependencies": []
+    },
+    {
+      "id": "azure-strategy",
+      "name": "Azure Hosting Strategy",
+      "description": "Azure service selection and hosting patterns",
+      "category": "cloud",
+      "version": "1.0.0",
+      "fileName": "strategy-azure.md",
+      "dependencies": []
+    },
+    {
+      "id": "devops-strategy",
+      "name": "DevOps CI/CD Strategy",
+      "description": "Continuous integration and deployment practices",
+      "category": "devops",
+      "version": "1.0.0",
+      "fileName": "strategy-devops.md",
+      "dependencies": []
+    },
+    {
+      "id": "iac-strategy",
+      "name": "Infrastructure as Code (Pulumi)",
+      "description": "IaC patterns and best practices with Pulumi",
+      "category": "infrastructure",
+      "version": "1.0.0",
+      "fileName": "strategy-iac.md",
+      "dependencies": []
+    },
+    {
+      "id": "4d-safe-strategy",
+      "name": "4D SDLC + SAFe Work Management",
+      "description": "Work management combining 4D phases with SAFe practices",
+      "category": "work-management",
+      "version": "1.0.0",
+      "fileName": "strategy-4d-safe.md",
+      "dependencies": []
+    },
+    {
+      "id": "ea-strategy",
+      "name": "Enterprise Architecture (TOGAF/Zachman)",
+      "description": "EA questions for product planning and feature design",
+      "category": "architecture",
+      "version": "1.0.0",
+      "fileName": "strategy-ea.md",
+      "dependencies": []
+    }
+  ]
+}
