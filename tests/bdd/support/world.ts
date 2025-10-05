@@ -135,5 +135,39 @@ export class ExtensionWorld extends World {
   }
 }
 
+/**
+ * Kiro-specific World class with framework management properties
+ */
+export class KiroWorld extends ExtensionWorld {
+  // Workspace paths
+  public workspacePath!: string;
+  public kiroPath!: string;
+  public steeringPath!: string;
+  
+  // Framework management
+  public selectedFramework?: { id: string; name: string; fileName: string };
+  public installedFrameworks?: string[];
+  public installedVersion?: number;
+  public availableVersion?: number;
+  public isCustomized?: boolean;
+  
+  // User interactions
+  public userSelection?: string;
+  public commandResult?: unknown;
+  public lastError?: unknown;
+  public notificationClicked?: boolean;
+  public selectedForUpdate?: string;
+  public treeViewOpened?: boolean;
+  
+  // File operations
+  public existingFileContent?: string;
+  public installedFilePath?: string;
+  public openedDocument?: vscode.TextDocument;
+  
+  constructor(options: IWorldOptions) {
+    super(options);
+  }
+}
+
 // Set the custom World constructor
-setWorldConstructor(ExtensionWorld);
+setWorldConstructor(KiroWorld);

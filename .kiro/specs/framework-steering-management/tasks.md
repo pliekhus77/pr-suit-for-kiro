@@ -414,7 +414,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Configure BDD test runner in package.json
     - _Requirements: All_
   
-  - [ ] 16.2 Implement BDD scenarios from testing-plan.md
+  - [x] 16.2 Implement BDD scenarios from testing-plan.md
     - Create feature file: framework-installation.feature
     - Implement steps for "Browse and install a framework" scenario
     - Implement steps for "Install framework with conflict" scenario

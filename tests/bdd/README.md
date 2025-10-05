@@ -231,3 +231,64 @@ See `features/example.feature` and `step-definitions/example.steps.ts` for worki
 - [Playwright Documentation](https://playwright.dev/)
 - [VS Code Extension Testing](https://code.visualstudio.com/api/working-with-extensions/testing-extension)
 - [Gherkin Reference](https://cucumber.io/docs/gherkin/reference/)
+
+
+## Implemented Scenarios
+
+### Framework Installation (framework-installation.feature)
+
+This feature tests the framework browsing and installation functionality:
+
+- ✅ **Browse and install a framework (Happy Path)**: Tests the complete flow of browsing available frameworks, selecting one, and installing it to the workspace
+- ✅ **Install framework with conflict (Failure Path)**: Tests handling of conflicts when a framework file already exists, including backup and overwrite options
+
+### Framework Management (framework-management.feature)
+
+This feature tests framework viewing, updating, and management:
+
+- ✅ **View installed frameworks in tree view (Happy Path)**: Tests displaying installed frameworks in the tree view and opening them in the editor
+- ✅ **Update outdated framework (Happy Path)**: Tests the complete update flow including update detection, diff preview, and version updates
+- ✅ **Update customized framework (Edge Case)**: Tests handling of customized frameworks during updates, including backup creation
+
+## Implementation Status
+
+The step definitions are currently **stubs** that provide the structure for BDD tests. They:
+- Set up the test context (workspace, paths, files)
+- Simulate user interactions
+- Verify basic file operations
+- Use assertions to validate behavior
+
+### Next Steps for Full Implementation
+
+To make these tests fully functional, the following enhancements are needed:
+
+1. **VS Code UI Interaction**: Implement actual interaction with VS Code quick picks, dialogs, and notifications
+2. **Command Execution**: Ensure commands are properly registered and executed in the test environment
+3. **Tree View Testing**: Add verification of tree view provider state and rendering
+4. **Webview Testing**: Use Playwright to test any webview-based UI components
+5. **Notification Verification**: Implement checking of VS Code notification API calls
+6. **File System Verification**: Enhance file system checks to verify actual content and metadata
+
+### Running the Implemented Tests
+
+```bash
+# Run all framework tests
+npm run test:bdd -- tests/bdd/features/framework-*.feature
+
+# Run only installation tests
+npm run test:bdd -- tests/bdd/features/framework-installation.feature
+
+# Run only management tests
+npm run test:bdd -- tests/bdd/features/framework-management.feature
+```
+
+## Test Coverage
+
+These BDD scenarios cover the following requirements from the testing plan:
+
+- **Requirements 1.1-1.6**: Framework browsing and discovery
+- **Requirements 2.1-2.7**: Framework installation and conflict handling
+- **Requirements 3.1-3.7**: Tree view display and interaction
+- **Requirements 4.1-4.8**: Framework updates and versioning
+
+See [testing-plan.md](../../.kiro/specs/framework-steering-management/testing-plan.md) for complete test coverage details.
