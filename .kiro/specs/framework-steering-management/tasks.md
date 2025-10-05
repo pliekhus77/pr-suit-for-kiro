@@ -371,7 +371,7 @@ This implementation plan breaks down the Framework Steering Management feature i
     - Test rollback on update failure
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8_
   
-  - [ ] 14.4 Search framework references - complete implementation
+  - [x] 14.4 Search framework references - complete implementation
     - Test "agentic-reviewer.searchFrameworks" command registration
     - Test search prompt for query input
     - Test search results display from framework reference docs
