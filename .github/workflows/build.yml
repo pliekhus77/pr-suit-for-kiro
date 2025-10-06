@@ -122,6 +122,18 @@ jobs:
             exit 1
           fi
           
+      - name: Upload test results
+        if: always() && steps.test.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            coverage/coverage-summary.json
+            coverage/cobertura-coverage.xml
+            coverage/lcov.info
+          retention-days: 30
+          if-no-files-found: warn
+          
       - name: Upload coverage reports
         if: always() && steps.test.outcome == 'success'
         uses: actions/upload-artifact@v4
