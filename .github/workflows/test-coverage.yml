@@ -36,6 +36,16 @@ jobs:
     - name: Check coverage thresholds
       run: npm run coverage:check
       
+    - name: Enforce 80% coverage requirement
+      run: |
+        COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+        echo "Current coverage: $COVERAGE%"
+        if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+          echo "❌ Coverage is below 80% threshold. Current: $COVERAGE%"
+          exit 1
+        fi
+        echo "✅ Coverage meets 80% threshold"
+      
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:

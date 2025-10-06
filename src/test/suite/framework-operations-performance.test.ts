@@ -46,7 +46,7 @@ suite('Framework Operations Performance Tests', () => {
       await extension.activate();
     }
     
-    const context = extension.exports?.context || (extension as any).extensionContext;
+    const context = extension.exports?.context || (extension as unknown as { extensionContext: vscode.ExtensionContext }).extensionContext;
     if (!context) {
       throw new Error('Extension context not available');
     }

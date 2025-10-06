@@ -1,0 +1,185 @@
+name: Test Failure Notifications
+
+on:
+  workflow_run:
+    workflows: ["Continuous Integration", "Test Coverage"]
+    types:
+      - completed
+
+jobs:
+  notify-on-failure:
+    name: Notify on Test Failure
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    
+    steps:
+    - name: Get workflow run details
+      id: workflow
+      run: |
+        echo "workflow_name=${{ github.event.workflow_run.name }}" >> $GITHUB_OUTPUT
+        echo "workflow_url=${{ github.event.workflow_run.html_url }}" >> $GITHUB_OUTPUT
+        echo "branch=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_OUTPUT
+        echo "commit=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+        echo "actor=${{ github.event.workflow_run.actor.login }}" >> $GITHUB_OUTPUT
+    
+    - name: Create GitHub Issue for Test Failure
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const workflowName = '${{ steps.workflow.outputs.workflow_name }}';
+          const workflowUrl = '${{ steps.workflow.outputs.workflow_url }}';
+          const branch = '${{ steps.workflow.outputs.branch }}';
+          const commit = '${{ steps.workflow.outputs.commit }}';
+          const actor = '${{ steps.workflow.outputs.actor }}';
+          
+          // Check if issue already exists
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'test-failure,automated',
+            per_page: 100
+          });
+          
+          const existingIssue = issues.data.find(issue => 
+            issue.title.includes(workflowName) && 
+            issue.title.includes(branch)
+          );
+          
+          if (existingIssue) {
+            // Update existing issue
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: existingIssue.number,
+              body: `## Test Failure Update\n\n` +
+                    `**Workflow:** ${workflowName}\n` +
+                    `**Branch:** ${branch}\n` +
+                    `**Commit:** ${commit}\n` +
+                    `**Triggered by:** @${actor}\n` +
+                    `**Run:** ${workflowUrl}\n\n` +
+                    `The tests are still failing. Please investigate and fix.`
+            });
+          } else {
+            // Create new issue
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔴 Test Failure: ${workflowName} on ${branch}`,
+              body: `## Test Failure Detected\n\n` +
+                    `**Workflow:** ${workflowName}\n` +
+                    `**Branch:** ${branch}\n` +
+                    `**Commit:** ${commit}\n` +
+                    `**Triggered by:** @${actor}\n` +
+                    `**Run:** ${workflowUrl}\n\n` +
+                    `### Action Required\n` +
+                    `Tests have failed in the CI pipeline. Please:\n` +
+                    `1. Review the workflow run logs\n` +
+                    `2. Identify the failing tests\n` +
+                    `3. Fix the issues\n` +
+                    `4. Push a fix or revert the breaking changes\n\n` +
+                    `This issue will be automatically closed when tests pass.`,
+              labels: ['test-failure', 'automated', 'priority-high'],
+              assignees: [actor]
+            });
+          }
+    
+    - name: Send Slack notification (if configured)
+      if: env.SLACK_WEBHOOK_URL != ''
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      run: |
+        curl -X POST $SLACK_WEBHOOK_URL \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "text": "🔴 Test Failure Alert",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "🔴 Test Failure in CI Pipeline"
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Workflow:*\n${{ steps.workflow.outputs.workflow_name }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Branch:*\n${{ steps.workflow.outputs.branch }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Triggered by:*\n${{ steps.workflow.outputs.actor }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Commit:*\n${{ steps.workflow.outputs.commit }}"
+                  }
+                ]
+              },
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "View Workflow Run"
+                    },
+                    "url": "${{ steps.workflow.outputs.workflow_url }}"
+                  }
+                ]
+              }
+            ]
+          }'
+
+  close-issue-on-success:
+    name: Close Issue on Success
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+    - name: Get workflow details
+      id: workflow
+      run: |
+        echo "workflow_name=${{ github.event.workflow_run.name }}" >> $GITHUB_OUTPUT
+        echo "branch=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_OUTPUT
+    
+    - name: Close related test failure issues
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const workflowName = '${{ steps.workflow.outputs.workflow_name }}';
+          const branch = '${{ steps.workflow.outputs.branch }}';
+          
+          // Find open test failure issues for this workflow and branch
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: 'test-failure,automated',
+            per_page: 100
+          });
+          
+          for (const issue of issues.data) {
+            if (issue.title.includes(workflowName) && issue.title.includes(branch)) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: '✅ Tests are now passing. Automatically closing this issue.'
+              });
+            }
+          }

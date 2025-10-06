@@ -291,6 +291,44 @@ vsce package
 2. Manually run "Update All Frameworks" command
 3. Verify internet connection (if checking remote versions)
 
+## 🛡️ Quality Gates
+
+This project enforces strict quality standards through automated quality gates:
+
+### Coverage Requirements
+- **Minimum Coverage**: 80% (lines, branches, functions, statements)
+- **Critical Paths**: 100% coverage required
+- **Enforcement**: Pre-commit hooks, CI/CD pipeline, PR checks
+
+### Quality Levels
+1. **Pre-Commit** - Fast local checks (~30s)
+   - ESLint code quality
+   - Unit tests execution
+   - TypeScript compilation
+
+2. **Continuous Integration** - Comprehensive checks (~5-10min)
+   - Multi-version testing (Node 18.x, 20.x)
+   - Unit, integration, and BDD tests
+   - Security scanning
+   - Build verification
+
+3. **Pull Request** - Merge requirements
+   - All CI checks pass
+   - Coverage ≥ 80%
+   - 1 approval required
+   - Conversations resolved
+
+4. **Post-Merge** - Monitoring
+   - Automated test failure notifications
+   - Coverage trend tracking
+   - Security alerts
+
+### Documentation
+- **Comprehensive Guide**: [docs/QUALITY_GATES.md](docs/QUALITY_GATES.md)
+- **Quick Reference**: [docs/QUALITY_GATES_QUICK_REFERENCE.md](docs/QUALITY_GATES_QUICK_REFERENCE.md)
+- **Setup Summary**: [docs/QUALITY_GATES_SETUP_SUMMARY.md](docs/QUALITY_GATES_SETUP_SUMMARY.md)
+- **Branch Protection**: [.github/BRANCH_PROTECTION.md](.github/BRANCH_PROTECTION.md)
+
 ## Release Notes
 
 ### 0.1.0
@@ -301,6 +339,7 @@ Initial release with core framework management features:
 - Workspace initialization
 - Custom steering document creation
 - Steering document validation
+- Comprehensive quality gates with 80% coverage enforcement
 
 ## License
 

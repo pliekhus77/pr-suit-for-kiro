@@ -11,9 +11,14 @@ import * as vscode from 'vscode';
 // Mock VS Code API
 jest.mock('vscode');
 
+interface MockContext extends Partial<vscode.ExtensionContext> {
+  extensionPath: string;
+  subscriptions: { dispose(): void }[];
+}
+
 describe('Security: Input Validation Tests', () => {
   let mockFileSystem: jest.Mocked<FileSystemOperations>;
-  let mockContext: any;
+  let mockContext: MockContext;
 
   beforeEach(() => {
     // Create mock file system
@@ -33,7 +38,7 @@ describe('Security: Input Validation Tests', () => {
       getMetadataPath: jest.fn().mockReturnValue('/test/workspace/.kiro/.metadata'),
       getSpecsPath: jest.fn().mockReturnValue('/test/workspace/.kiro/specs'),
       getSettingsPath: jest.fn().mockReturnValue('/test/workspace/.kiro/settings'),
-    } as any;
+    } as unknown as jest.Mocked<FileSystemOperations>;
 
     // Create mock extension context
     mockContext = {
@@ -412,7 +417,7 @@ describe('Security: Input Validation Tests', () => {
         getText: () => largeContent,
         uri: { fsPath: '/test/large.md' },
         lineCount: 1,
-      } as any;
+      } as unknown as vscode.TextDocument;
 
       const startTime = Date.now();
       const result = await validator.validate(mockDocument);
@@ -427,7 +432,7 @@ describe('Security: Input Validation Tests', () => {
       const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
       
       // Create valid manifest with deeply nested framework object
-      const deeplyNestedFramework: any = {
+      const deeplyNestedFramework: Record<string, unknown> = {
         id: 'test',
         name: 'Test',
         description: 'Test',
@@ -437,7 +442,7 @@ describe('Security: Input Validation Tests', () => {
       };
       
       // Add 100 levels of nesting in a property
-      let nested: any = { value: 'deep' };
+      let nested: Record<string, unknown> = { value: 'deep' };
       for (let i = 0; i < 100; i++) {
         nested = { nested };
       }
@@ -493,7 +498,7 @@ describe('Security: Input Validation Tests', () => {
         getText: () => content,
         uri: { fsPath: '/test/long-line.md' },
         lineCount: 5,
-      } as any;
+      } as unknown as vscode.TextDocument;
 
       const startTime = Date.now();
       const result = await validator.validate(mockDocument);
@@ -607,7 +612,7 @@ describe('Security: Input Validation Tests', () => {
 
     it('should handle JSON with circular references', async () => {
       // Create object with circular reference
-      const obj: any = { frameworks: [] };
+      const obj: Record<string, unknown> = { frameworks: [] };
       obj.circular = obj;
       
       // JSON.stringify will throw on circular references
@@ -646,7 +651,7 @@ describe('Security: Input Validation Tests', () => {
       const frameworks = await frameworkManager.listAvailableFrameworks();
       expect(frameworks.length).toBe(1);
       // Should not pollute prototype
-      expect((Object.prototype as any).polluted).toBeUndefined();
+      expect((Object.prototype as Record<string, unknown>).polluted).toBeUndefined();
     });
 
     it('should not allow constructor in framework objects', async () => {

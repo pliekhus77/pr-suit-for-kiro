@@ -44,7 +44,7 @@ suite('Workspace Initialization Integration Tests', () => {
   test('Directory creation - all required directories', async () => {
     // Mock user input to skip framework installation
     const originalShowInformationMessage = vscode.window.showInformationMessage;
-    vscode.window.showInformationMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showInformationMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('recommended framework')) {
         return 'Skip';
       }
@@ -89,7 +89,7 @@ suite('Workspace Initialization Integration Tests', () => {
     let frameworkPromptShown = false;
     let welcomeMessageShown = false;
     
-    vscode.window.showInformationMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showInformationMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('recommended framework')) {
         frameworkPromptShown = true;
         return 'Yes';
@@ -136,14 +136,14 @@ suite('Workspace Initialization Integration Tests', () => {
     let browseCommandExecuted = false;
     const originalExecuteCommand = vscode.commands.executeCommand;
     
-    vscode.window.showInformationMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showInformationMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('recommended framework')) {
         return 'Custom';
       }
       return 'Dismiss';
     };
 
-    (vscode.commands.executeCommand as any) = async (command: string, ...args: any[]) => {
+    (vscode.commands.executeCommand as unknown as (command: string, ...args: unknown[]) => Promise<unknown>) = async (command: string, ..._args: unknown[]) => {
       if (command === 'agentic-reviewer.browseFrameworks') {
         browseCommandExecuted = true;
         return;
@@ -175,7 +175,7 @@ suite('Workspace Initialization Integration Tests', () => {
     const originalShowInformationMessage = vscode.window.showInformationMessage;
     let skipOptionSelected = false;
     
-    vscode.window.showInformationMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showInformationMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('recommended framework')) {
         skipOptionSelected = true;
         return 'Skip';
@@ -207,7 +207,7 @@ suite('Workspace Initialization Integration Tests', () => {
     let welcomeMessageContent = '';
     let browseOptionShown = false;
     
-    vscode.window.showInformationMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showInformationMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('recommended framework')) {
         return 'Skip';
       }
@@ -261,14 +261,14 @@ suite('Workspace Initialization Integration Tests', () => {
     let contextSet = false;
     const originalExecuteCommand = vscode.commands.executeCommand;
     
-    vscode.window.showInformationMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showInformationMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('recommended framework')) {
         return 'Skip';
       }
       return 'Dismiss';
     };
 
-    (vscode.commands.executeCommand as any) = async (command: string, ...args: any[]) => {
+    (vscode.commands.executeCommand as unknown as (command: string, ...args: unknown[]) => Promise<unknown>) = async (command: string, ...args: unknown[]) => {
       if (command === 'agentic-reviewer.refreshSteeringTree') {
         refreshCommandExecuted = true;
       }
@@ -303,7 +303,7 @@ suite('Workspace Initialization Integration Tests', () => {
     const originalShowInformationMessage = vscode.window.showInformationMessage;
     let warningShown = false;
     
-    vscode.window.showWarningMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showWarningMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('already initialized')) {
         warningShown = true;
         return 'Cancel';
@@ -311,7 +311,7 @@ suite('Workspace Initialization Integration Tests', () => {
       return undefined;
     };
 
-    vscode.window.showInformationMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showInformationMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       return 'Dismiss';
     };
 
@@ -337,7 +337,7 @@ suite('Workspace Initialization Integration Tests', () => {
     const originalShowInformationMessage = vscode.window.showInformationMessage;
     let continueSelected = false;
     
-    vscode.window.showWarningMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showWarningMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('already initialized')) {
         continueSelected = true;
         return 'Continue';
@@ -345,7 +345,7 @@ suite('Workspace Initialization Integration Tests', () => {
       return undefined;
     };
 
-    vscode.window.showInformationMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showInformationMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('recommended framework')) {
         return 'Skip';
       }
@@ -371,14 +371,14 @@ suite('Workspace Initialization Integration Tests', () => {
     const originalShowWarningMessage = vscode.window.showWarningMessage;
     const originalShowInformationMessage = vscode.window.showInformationMessage;
     
-    vscode.window.showWarningMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showWarningMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('already initialized')) {
         return 'Continue';
       }
       return undefined;
     };
 
-    vscode.window.showInformationMessage = async (message: string, options?: any, ...items: unknown[]) => {
+    vscode.window.showInformationMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('recommended framework')) {
         return 'Skip';
       }

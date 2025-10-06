@@ -63,7 +63,7 @@ suite('Custom Steering Integration Tests', () => {
 
     // Mock user input
     const originalShowInputBox = vscode.window.showInputBox;
-    vscode.window.showInputBox = async (options?: any) => {
+    vscode.window.showInputBox = async (_options?: vscode.InputBoxOptions) => {
       return documentName;
     };
 
@@ -118,7 +118,7 @@ suite('Custom Steering Integration Tests', () => {
       const originalShowInputBox = vscode.window.showInputBox;
       let validationError: string | undefined;
       
-      vscode.window.showInputBox = async (options?: any) => {
+      vscode.window.showInputBox = async (_options?: vscode.InputBoxOptions) => {
         if (options?.validateInput) {
           validationError = options.validateInput(invalidName);
         }
@@ -149,11 +149,11 @@ suite('Custom Steering Integration Tests', () => {
     const originalShowInputBox = vscode.window.showInputBox;
     const originalShowWarningMessage = vscode.window.showWarningMessage;
     
-    vscode.window.showInputBox = async (options?: any) => {
+    vscode.window.showInputBox = async (_options?: vscode.InputBoxOptions) => {
       return documentName;
     };
     
-    vscode.window.showWarningMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showWarningMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       return 'Overwrite';
     };
 
@@ -186,11 +186,11 @@ suite('Custom Steering Integration Tests', () => {
     const originalShowInputBox = vscode.window.showInputBox;
     const originalShowWarningMessage = vscode.window.showWarningMessage;
     
-    vscode.window.showInputBox = async (options?: any) => {
+    vscode.window.showInputBox = async (_options?: vscode.InputBoxOptions) => {
       return documentName;
     };
     
-    vscode.window.showWarningMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showWarningMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       return 'Cancel';
     };
 
@@ -230,7 +230,7 @@ suite('Custom Steering Integration Tests', () => {
 
     // Mock user input
     const originalShowInputBox = vscode.window.showInputBox;
-    vscode.window.showInputBox = async (options?: any) => {
+    vscode.window.showInputBox = async (_options?: vscode.InputBoxOptions) => {
       return newName;
     };
 
@@ -272,7 +272,7 @@ suite('Custom Steering Integration Tests', () => {
 
     // Mock user input to use conflicting name
     const originalShowInputBox = vscode.window.showInputBox;
-    vscode.window.showInputBox = async (options?: any) => {
+    vscode.window.showInputBox = async (_options?: vscode.InputBoxOptions) => {
       return conflictName;
     };
 
@@ -308,7 +308,7 @@ suite('Custom Steering Integration Tests', () => {
 
     // Mock user confirmation
     const originalShowWarningMessage = vscode.window.showWarningMessage;
-    vscode.window.showWarningMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showWarningMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       return 'Delete';
     };
 
@@ -339,7 +339,7 @@ suite('Custom Steering Integration Tests', () => {
 
     // Mock user cancellation
     const originalShowWarningMessage = vscode.window.showWarningMessage;
-    vscode.window.showWarningMessage = async (message: string, options?: any, ...items: any[]) => {
+    vscode.window.showWarningMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       return 'Cancel';
     };
 
@@ -390,7 +390,7 @@ suite('Custom Steering Integration Tests', () => {
 
     // Try to rename strategy file (should fail)
     const originalShowInputBox = vscode.window.showInputBox;
-    vscode.window.showInputBox = async (options?: any) => {
+    vscode.window.showInputBox = async (_options?: vscode.InputBoxOptions) => {
       return 'new-name';
     };
 
@@ -414,7 +414,7 @@ suite('Custom Steering Integration Tests', () => {
 
     // Mock user input
     const originalShowInputBox = vscode.window.showInputBox;
-    vscode.window.showInputBox = async (options?: any) => {
+    vscode.window.showInputBox = async (_options?: vscode.InputBoxOptions) => {
       return documentName;
     };
 

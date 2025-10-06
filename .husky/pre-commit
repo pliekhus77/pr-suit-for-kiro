@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run lint-staged for code quality checks
+npx lint-staged
+
+# Run unit tests to ensure nothing is broken
+echo "Running unit tests..."
+npm run test -- --passWithNoTests --bail
+
+# Check if tests passed
+if [ $? -ne 0 ]; then
+  echo "❌ Unit tests failed. Please fix the tests before committing."
+  exit 1
+fi
+
+echo "✅ Pre-commit checks passed!"
