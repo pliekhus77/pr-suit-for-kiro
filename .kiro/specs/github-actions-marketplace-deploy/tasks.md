@@ -402,7 +402,7 @@ This implementation plan breaks down the GitHub Actions CI/CD pipeline into disc
   - Document secret values and formats
   - _Requirements: 10.3_
 
-- [ ] 11.3 Document manual triggers
+- [x] 11.3 Document manual triggers
   - Document rollback trigger process
   - Document manual deployment process
   - Document emergency procedures
