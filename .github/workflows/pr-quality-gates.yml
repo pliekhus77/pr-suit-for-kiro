@@ -104,6 +104,16 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
         
+      - name: Validate version
+        id: version
+        run: |
+          echo "### 📦 Version Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Run version validation script
+          node scripts/validate-version.js origin/${{ github.base_ref }}
+        continue-on-error: false
+        
       - name: Check coverage threshold
         id: coverage
         if: always() && steps.test.outcome == 'success'
@@ -242,6 +252,15 @@ jobs:
             echo "| Code Coverage (≥80%) | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| Code Coverage (≥80%) | ⚠️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Version validation status
+          if [ "${{ steps.version.outcome }}" == "success" ]; then
+            echo "| Version Validation | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.version.outcome }}" == "failure" ]; then
+            echo "| Version Validation | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Version Validation | ⚠️ Skipped |" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
