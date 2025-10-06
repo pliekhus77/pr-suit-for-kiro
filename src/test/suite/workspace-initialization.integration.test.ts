@@ -143,7 +143,7 @@ suite('Workspace Initialization Integration Tests', () => {
       return 'Dismiss';
     };
 
-    (vscode.commands.executeCommand as unknown as (command: string, ...args: unknown[]) => Promise<unknown>) = async (command: string, ..._args: unknown[]) => {
+    (vscode.commands.executeCommand as unknown as (command: string, ...args: unknown[]) => Promise<unknown>) = async (command: string, ...args: unknown[]) => {
       if (command === 'agentic-reviewer.browseFrameworks') {
         browseCommandExecuted = true;
         return;
@@ -207,7 +207,7 @@ suite('Workspace Initialization Integration Tests', () => {
     let welcomeMessageContent = '';
     let browseOptionShown = false;
     
-    vscode.window.showInformationMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
+    vscode.window.showInformationMessage = async (message: string, _options?: vscode.MessageOptions, ...items: string[]) => {
       if (message.includes('recommended framework')) {
         return 'Skip';
       }
@@ -303,7 +303,7 @@ suite('Workspace Initialization Integration Tests', () => {
     const originalShowInformationMessage = vscode.window.showInformationMessage;
     let warningShown = false;
     
-    vscode.window.showWarningMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
+    vscode.window.showWarningMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('already initialized')) {
         warningShown = true;
         return 'Cancel';
@@ -337,7 +337,7 @@ suite('Workspace Initialization Integration Tests', () => {
     const originalShowInformationMessage = vscode.window.showInformationMessage;
     let continueSelected = false;
     
-    vscode.window.showWarningMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
+    vscode.window.showWarningMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('already initialized')) {
         continueSelected = true;
         return 'Continue';
@@ -371,7 +371,7 @@ suite('Workspace Initialization Integration Tests', () => {
     const originalShowWarningMessage = vscode.window.showWarningMessage;
     const originalShowInformationMessage = vscode.window.showInformationMessage;
     
-    vscode.window.showWarningMessage = async (_message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
+    vscode.window.showWarningMessage = async (message: string, _options?: vscode.MessageOptions, ..._items: string[]) => {
       if (message.includes('already initialized')) {
         return 'Continue';
       }
@@ -414,3 +414,6 @@ suite('Workspace Initialization Integration Tests', () => {
     assert.ok(true, 'Error handling for no workspace is covered in unit tests');
   });
 });
+
+
+

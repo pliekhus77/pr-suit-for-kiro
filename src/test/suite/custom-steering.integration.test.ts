@@ -116,9 +116,9 @@ suite('Custom Steering Integration Tests', () => {
     for (const invalidName of invalidNames) {
       // Mock user input
       const originalShowInputBox = vscode.window.showInputBox;
-      let validationError: string | undefined;
+      let validationError: string | vscode.InputBoxValidationMessage | Thenable<string | vscode.InputBoxValidationMessage | null | undefined> | null | undefined;
       
-      vscode.window.showInputBox = async (_options?: vscode.InputBoxOptions) => {
+      vscode.window.showInputBox = async (options?: vscode.InputBoxOptions) => {
         if (options?.validateInput) {
           validationError = options.validateInput(invalidName);
         }
@@ -456,3 +456,6 @@ suite('Custom Steering Integration Tests', () => {
     }
   });
 });
+
+
+

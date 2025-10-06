@@ -4,9 +4,9 @@
 # Run lint-staged for code quality checks
 npx lint-staged
 
-# Run unit tests to ensure nothing is broken
+# Run unit tests without coverage threshold (for faster commits)
 echo "Running unit tests..."
-npm run test -- --passWithNoTests --bail
+npm run test -- --passWithNoTests --bail --coverage=false
 
 # Check if tests passed
 if [ $? -ne 0 ]; then
@@ -15,3 +15,4 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "✅ Pre-commit checks passed!"
+echo "💡 Note: Full coverage checks run in CI/CD pipeline"

@@ -52,7 +52,7 @@ describe('Security: Input Validation Tests', () => {
 
   describe('Path Traversal Attacks', () => {
     it('should reject path traversal attempts with ../ in framework ID', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       // Mock manifest with normal framework
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
@@ -77,7 +77,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should reject path traversal attempts with absolute paths', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -92,7 +92,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should reject path traversal in fileName field', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       // Mock manifest with malicious fileName
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
@@ -117,7 +117,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should sanitize file paths to prevent directory traversal', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -140,7 +140,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should reject null bytes in file paths', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -166,7 +166,7 @@ describe('Security: Input Validation Tests', () => {
 
   describe('Search Query Injection Attacks', () => {
     it('should handle regex special characters in search queries', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -202,7 +202,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle ReDoS (Regular Expression Denial of Service) patterns', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -238,7 +238,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle SQL injection-like patterns in search', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -272,7 +272,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle command injection patterns in search', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -317,7 +317,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle XSS in framework descriptions', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -341,7 +341,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle HTML entities in search queries', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -364,7 +364,7 @@ describe('Security: Input Validation Tests', () => {
 
   describe('Buffer Overflow with Large Inputs', () => {
     it('should handle very large framework IDs', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -379,7 +379,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle very large search queries', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -429,7 +429,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle deeply nested JSON in manifest', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       // Create valid manifest with deeply nested framework object
       const deeplyNestedFramework: Record<string, unknown> = {
@@ -461,7 +461,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle very long file names', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       // Create filename with 1000 characters
       const longFileName = 'a'.repeat(1000) + '.md';
@@ -512,7 +512,7 @@ describe('Security: Input Validation Tests', () => {
 
   describe('Unicode and Special Character Handling', () => {
     it('should handle Unicode characters in framework IDs', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -534,7 +534,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle emoji in search queries', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -555,7 +555,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle zero-width characters', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       // Zero-width characters that could be used for obfuscation
       const zeroWidthChars = '\u200B\u200C\u200D\uFEFF';
@@ -579,7 +579,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle RTL (Right-to-Left) characters', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -602,7 +602,7 @@ describe('Security: Input Validation Tests', () => {
 
   describe('Malformed JSON Handling', () => {
     it('should handle malformed JSON in manifest', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue('{ invalid json }');
 
@@ -620,7 +620,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should handle truncated JSON', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue('{"version":"1.0.0","frameworks":[{"id":"test"');
 
@@ -631,7 +631,7 @@ describe('Security: Input Validation Tests', () => {
 
   describe('Prototype Pollution Prevention', () => {
     it('should not allow __proto__ in framework objects', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -655,7 +655,7 @@ describe('Security: Input Validation Tests', () => {
     });
 
     it('should not allow constructor in framework objects', async () => {
-      const frameworkManager = new FrameworkManager(mockContext, mockFileSystem);
+      const frameworkManager = new FrameworkManager(mockContext as vscode.ExtensionContext, mockFileSystem);
       
       mockFileSystem.readFile.mockResolvedValue(JSON.stringify({
         version: '1.0.0',
@@ -677,3 +677,4 @@ describe('Security: Input Validation Tests', () => {
     });
   });
 });
+
