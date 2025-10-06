@@ -43,13 +43,97 @@ jobs:
           echo "📌 Release version: $VERSION"
           echo "📌 Release tag: $TAG_NAME"
       
-      - name: Download VSIX artifact
+      - name: Find package workflow run
+        id: find-workflow
+        run: |
+          VERSION="${{ steps.extract-version.outputs.version }}"
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          
+          echo "🔍 Searching for package workflow run for tag: $TAG_NAME"
+          
+          # Use GitHub API to find the workflow run that created the artifact
+          WORKFLOW_RUNS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/package.yml/runs?event=push&status=success&per_page=10")
+          
+          # Find the run that matches our tag
+          RUN_ID=$(echo "$WORKFLOW_RUNS" | jq -r ".workflow_runs[] | select(.head_branch == \"$TAG_NAME\") | .id" | head -n 1)
+          
+          if [ -z "$RUN_ID" ] || [ "$RUN_ID" == "null" ]; then
+            echo "❌ Could not find successful package workflow run for tag $TAG_NAME"
+            echo "workflow-found=false" >> $GITHUB_OUTPUT
+            
+            echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Reason:** Package workflow run not found" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Could not find a successful package workflow run for tag \`$TAG_NAME\`." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Troubleshooting Steps:" >> $GITHUB_STEP_SUMMARY
+            echo "1. Verify the package workflow ran successfully for tag \`$TAG_NAME\`" >> $GITHUB_STEP_SUMMARY
+            echo "2. Check [Actions tab](${{ github.server_url }}/${{ github.repository }}/actions/workflows/package.yml)" >> $GITHUB_STEP_SUMMARY
+            echo "3. Ensure the tag was pushed before creating the release" >> $GITHUB_STEP_SUMMARY
+            echo "4. Wait a few minutes if the package workflow is still running" >> $GITHUB_STEP_SUMMARY
+            
+            exit 1
+          fi
+          
+          echo "workflow-found=true" >> $GITHUB_OUTPUT
+          echo "run-id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "✅ Found package workflow run: $RUN_ID"
+      
+      - name: Download VSIX artifact from package workflow
         id: download
-        uses: actions/download-artifact@v4
-        with:
-          name: vsix-package-${{ steps.extract-version.outputs.version }}
-          path: ./artifacts
-        continue-on-error: true
+        run: |
+          VERSION="${{ steps.extract-version.outputs.version }}"
+          RUN_ID="${{ steps.find-workflow.outputs.run-id }}"
+          ARTIFACT_NAME="vsix-package-${VERSION}"
+          
+          echo "📥 Downloading artifact: $ARTIFACT_NAME"
+          echo "📦 From workflow run: $RUN_ID"
+          
+          # List artifacts for the workflow run
+          ARTIFACTS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/$RUN_ID/artifacts")
+          
+          # Find the artifact ID
+          ARTIFACT_ID=$(echo "$ARTIFACTS" | jq -r ".artifacts[] | select(.name == \"$ARTIFACT_NAME\") | .id" | head -n 1)
+          
+          if [ -z "$ARTIFACT_ID" ] || [ "$ARTIFACT_ID" == "null" ]; then
+            echo "❌ Artifact not found: $ARTIFACT_NAME"
+            echo "artifact-found=false" >> $GITHUB_OUTPUT
+            
+            echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Reason:** VSIX artifact not found in package workflow" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The artifact \`$ARTIFACT_NAME\` was not found in workflow run $RUN_ID." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Available Artifacts:" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            echo "$ARTIFACTS" | jq -r '.artifacts[] | "- \(.name) (ID: \(.id))"' >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            
+            exit 1
+          fi
+          
+          echo "artifact-found=true" >> $GITHUB_OUTPUT
+          echo "artifact-id=$ARTIFACT_ID" >> $GITHUB_OUTPUT
+          echo "✅ Found artifact ID: $ARTIFACT_ID"
+          
+          # Download the artifact
+          mkdir -p ./artifacts
+          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip" \
+            -o ./artifacts/artifact.zip
+          
+          # Extract the artifact
+          cd ./artifacts
+          unzip -q artifact.zip
+          rm artifact.zip
+          cd ..
+          
+          echo "✅ Artifact downloaded and extracted"
       
       - name: Verify artifact download
         id: verify-artifact
@@ -58,20 +142,22 @@ jobs:
           VSIX_FILE="./artifacts/pragmatic-rhino-suit-${VERSION}.vsix"
           
           if [ ! -f "$VSIX_FILE" ]; then
-            echo "❌ VSIX artifact not found: $VSIX_FILE"
+            echo "❌ VSIX file not found after extraction: $VSIX_FILE"
             echo "artifact-found=false" >> $GITHUB_OUTPUT
             
             echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "**Reason:** VSIX artifact not found" >> $GITHUB_STEP_SUMMARY
+            echo "**Reason:** VSIX file not found after artifact extraction" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "The VSIX file for version $VERSION was not found in artifacts." >> $GITHUB_STEP_SUMMARY
-            echo "This may indicate that the package workflow did not complete successfully." >> $GITHUB_STEP_SUMMARY
+            echo "The artifact was downloaded but the expected VSIX file was not found." >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "### Troubleshooting Steps:" >> $GITHUB_STEP_SUMMARY
-            echo "1. Check if the package workflow ran for tag \`v${VERSION}\`" >> $GITHUB_STEP_SUMMARY
-            echo "2. Verify the artifact was uploaded successfully" >> $GITHUB_STEP_SUMMARY
-            echo "3. Ensure the artifact name matches: \`vsix-package-${VERSION}\`" >> $GITHUB_STEP_SUMMARY
+            echo "### Expected File:" >> $GITHUB_STEP_SUMMARY
+            echo "\`$VSIX_FILE\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Actual Contents:" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            ls -la ./artifacts/ >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
             
             exit 1
           fi
