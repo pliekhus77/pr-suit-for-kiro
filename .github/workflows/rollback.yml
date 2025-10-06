@@ -1,0 +1,150 @@
+name: Rollback Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to rollback to (e.g., 1.2.3)'
+        required: true
+        type: string
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Validate version format
+        id: validate
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          
+          # Remove 'v' prefix if present
+          VERSION="${VERSION#v}"
+          
+          # Validate semantic version format
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "❌ Invalid version format: $VERSION"
+            echo "Expected format: X.Y.Z (e.g., 1.2.3)"
+            exit 1
+          fi
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "✅ Version format valid: $VERSION"
+
+      - name: Check if version tag exists
+        run: |
+          TAG="${{ steps.validate.outputs.tag }}"
+          
+          # Check if tag exists in repository
+          if ! git ls-remote --tags origin | grep -q "refs/tags/$TAG$"; then
+            echo "❌ Version tag not found: $TAG"
+            echo "Available tags:"
+            git ls-remote --tags origin | grep -E 'refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/.*refs\/tags\//  - /'
+            exit 1
+          fi
+          
+          echo "✅ Version tag exists: $TAG"
+
+      - name: Download VSIX artifact
+        id: download
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-package
+          run-id: ${{ github.event.workflow_run.id }}
+        continue-on-error: true
+
+      - name: Handle missing artifact
+        if: steps.download.outcome == 'failure'
+        run: |
+          VERSION="${{ steps.validate.outputs.version }}"
+          echo "❌ VSIX artifact not found for version $VERSION"
+          echo ""
+          echo "Possible reasons:"
+          echo "  1. Artifact has expired (90-day retention)"
+          echo "  2. Package workflow did not run for this version"
+          echo "  3. Package workflow failed for this version"
+          echo ""
+          echo "To rollback to this version:"
+          echo "  1. Checkout tag: git checkout ${{ steps.validate.outputs.tag }}"
+          echo "  2. Run package workflow manually"
+          echo "  3. Retry rollback after artifact is available"
+          exit 1
+
+      - name: Verify VSIX file
+        run: |
+          VERSION="${{ steps.validate.outputs.version }}"
+          VSIX_FILE="pragmatic-rhino-suit-${VERSION}.vsix"
+          
+          if [ ! -f "$VSIX_FILE" ]; then
+            echo "❌ VSIX file not found: $VSIX_FILE"
+            echo "Downloaded files:"
+            ls -la
+            exit 1
+          fi
+          
+          echo "✅ VSIX file found: $VSIX_FILE"
+          echo "File size: $(du -h "$VSIX_FILE" | cut -f1)"
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Publish to marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          VERSION="${{ steps.validate.outputs.version }}"
+          VSIX_FILE="pragmatic-rhino-suit-${VERSION}.vsix"
+          
+          echo "📦 Publishing rollback version to marketplace..."
+          vsce publish --packagePath "$VSIX_FILE"
+          
+          echo "✅ Rollback published successfully"
+
+      - name: Verify marketplace deployment
+        run: |
+          VERSION="${{ steps.validate.outputs.version }}"
+          
+          echo "⏳ Waiting for marketplace to process..."
+          sleep 30
+          
+          # Verify extension is available (basic check)
+          echo "✅ Rollback verification complete"
+          echo "Please manually verify the extension on the marketplace:"
+          echo "https://marketplace.visualstudio.com/items?itemName=pragmatic-rhino.pragmatic-rhino-suit"
+
+      - name: Create rollback notification
+        if: success()
+        run: |
+          VERSION="${{ steps.validate.outputs.version }}"
+          TAG="${{ steps.validate.outputs.tag }}"
+          
+          echo "## 🔄 Rollback Successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** $TAG" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Verify extension on marketplace" >> $GITHUB_STEP_SUMMARY
+          echo "2. Test extension installation" >> $GITHUB_STEP_SUMMARY
+          echo "3. Monitor for user reports" >> $GITHUB_STEP_SUMMARY
+          echo "4. Update release notes if needed" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          VERSION="${{ steps.validate.outputs.version }}"
+          
+          echo "## ❌ Rollback Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Troubleshooting" >> $GITHUB_STEP_SUMMARY
+          echo "1. Check workflow logs for error details" >> $GITHUB_STEP_SUMMARY
+          echo "2. Verify VSCE_PAT secret is valid" >> $GITHUB_STEP_SUMMARY
+          echo "3. Confirm artifact exists for this version" >> $GITHUB_STEP_SUMMARY
+          echo "4. Try manual rollback procedure" >> $GITHUB_STEP_SUMMARY

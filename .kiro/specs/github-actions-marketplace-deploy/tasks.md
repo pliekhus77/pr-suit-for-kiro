@@ -267,7 +267,7 @@ This implementation plan breaks down the GitHub Actions CI/CD pipeline into disc
 
 ## 7. Rollback Capability
 
-- [ ] 7.1 Create rollback workflow
+- [x] 7.1 Create rollback workflow
   - Create `.github/workflows/rollback.yml`
   - Configure manual workflow dispatch
   - Add version selection input
