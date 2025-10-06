@@ -28,3 +28,19 @@ jobs:
         
       - name: Compile TypeScript
         run: npm run compile
+        
+      - name: Run ESLint
+        id: lint
+        run: npm run lint
+        continue-on-error: false
+        
+      - name: Generate lint summary
+        if: always()
+        run: |
+          echo "### Linting Results" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.lint.outcome }}" == "success" ]; then
+            echo "✅ No linting errors found" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Linting errors detected - build failed" >> $GITHUB_STEP_SUMMARY
+            echo "Please fix linting errors before proceeding" >> $GITHUB_STEP_SUMMARY
+          fi
