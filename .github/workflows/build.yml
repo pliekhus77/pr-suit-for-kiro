@@ -44,3 +44,19 @@ jobs:
             echo "❌ Linting errors detected - build failed" >> $GITHUB_STEP_SUMMARY
             echo "Please fix linting errors before proceeding" >> $GITHUB_STEP_SUMMARY
           fi
+          
+      - name: Run tests
+        id: test
+        run: npm test
+        continue-on-error: false
+        
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "### Test Results" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.test.outcome }}" == "success" ]; then
+            echo "✅ All tests passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Tests failed - build failed" >> $GITHUB_STEP_SUMMARY
+            echo "Please fix failing tests before proceeding" >> $GITHUB_STEP_SUMMARY
+          fi
