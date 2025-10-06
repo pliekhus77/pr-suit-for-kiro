@@ -53,9 +53,12 @@ Create team-specific steering documents with templates and validation support.
 | **TDD/BDD Testing Strategy** | Testing | Test-driven and behavior-driven development practices with testing-plan.md requirements |
 | **SABSA Security Strategy** | Security | Security architecture, threat modeling (STRIDE), and compliance (GDPR, HIPAA, SOC2) |
 | **C4 Model Architecture** | Architecture | When and how to use C4 diagrams in specs (System Context, Container, Component, Dynamic) |
+| **AWS Hosting Strategy** | Cloud | AWS service selection, Well-Architected Framework (6 pillars), and hosting patterns |
 | **Azure Hosting Strategy** | Cloud | Azure service selection, Well-Architected principles, and hosting patterns |
 | **DevOps CI/CD Strategy** | DevOps | Continuous integration/deployment, DORA metrics, and deployment strategies |
-| **Infrastructure as Code (Pulumi)** | Infrastructure | IaC patterns and best practices with Pulumi |
+| **Infrastructure as Code (Pulumi)** | Infrastructure | IaC patterns and best practices with Pulumi (real programming languages) |
+| **Domain-Driven Design (DDD)** | Architecture | Strategic and tactical DDD patterns for complex business domains |
+| **.NET Best Practices** | Development | .NET 8.0 development standards for performance, security, and maintainability |
 | **4D SDLC + SAFe Work Management** | Work Management | Define-Design-Develop-Deploy phases with SAFe practices and WSJF prioritization |
 | **Enterprise Architecture (TOGAF/Zachman)** | Architecture | Strategic planning questions for product and feature design |
 
