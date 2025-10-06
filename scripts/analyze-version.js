@@ -327,6 +327,20 @@ function main() {
   console.log('Result:');
   console.log(JSON.stringify(result, null, 2));
   
+  // Output for GitHub Actions
+  if (process.env.GITHUB_OUTPUT) {
+    const fs = require('fs');
+    const output = [
+      `bump=${analysis.bump || 'none'}`,
+      `new-version=${nextVersion}`,
+      `current-version=${currentVersion}`
+    ].join('\n');
+    
+    fs.appendFileSync(process.env.GITHUB_OUTPUT, output + '\n');
+    console.log('\n📤 GitHub Actions outputs set:');
+    console.log(output);
+  }
+  
   process.exit(0);
 }
 

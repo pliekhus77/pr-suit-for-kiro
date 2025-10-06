@@ -306,15 +306,18 @@ function writeChangelog(changelogPath, content) {
 function main() {
   const args = process.argv.slice(2);
   
-  if (args.length === 0) {
+  // Support version from environment variable (for CI/CD) or command line
+  const version = process.env.NEW_VERSION || args[0];
+  
+  if (!version) {
     console.error('❌ Error: No version specified');
     console.error('\nUsage: node scripts/generate-changelog.js <version> [base-ref]');
+    console.error('   Or: NEW_VERSION=1.2.3 node scripts/generate-changelog.js [base-ref]');
     console.error('Example: node scripts/generate-changelog.js 1.2.3 v1.2.2');
     process.exit(1);
   }
   
-  const version = args[0];
-  const baseRef = args[1] || 'HEAD~1';
+  const baseRef = args[1] || args[0] || 'HEAD~1';
   const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   
   console.log('📝 Changelog Generator\n');

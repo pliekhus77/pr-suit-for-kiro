@@ -1,0 +1,148 @@
+name: Version Management
+
+# Trigger on pushes to main branch (after PR merge)
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/**'
+      - '!.github/workflows/**'
+
+# Ensure only one version workflow runs at a time
+concurrency:
+  group: version-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Analyze and Update Version
+    runs-on: ubuntu-latest
+    
+    # Skip if commit message contains [skip ci] or [skip version]
+    if: |
+      !contains(github.event.head_commit.message, '[skip ci]') &&
+      !contains(github.event.head_commit.message, '[skip version]')
+    
+    permissions:
+      contents: write  # Required to push commits and tags
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for version analysis
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Get current version
+        id: current-version
+        run: |
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          echo "Current version: $CURRENT_VERSION"
+      
+      - name: Get last version tag
+        id: last-tag
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            echo "No previous tags found, using initial commit"
+            LAST_TAG=$(git rev-list --max-parents=0 HEAD)
+          fi
+          echo "last-tag=$LAST_TAG" >> $GITHUB_OUTPUT
+          echo "Last tag/ref: $LAST_TAG"
+      
+      - name: Analyze commits for version bump
+        id: analyze
+        run: |
+          echo "Analyzing commits since ${{ steps.last-tag.outputs.last-tag }}..."
+          node scripts/analyze-version.js ${{ steps.last-tag.outputs.last-tag }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Update version in package.json
+        if: steps.analyze.outputs.bump != 'none'
+        id: update-version
+        run: |
+          NEW_VERSION="${{ steps.analyze.outputs.new-version }}"
+          echo "Updating version to $NEW_VERSION"
+          
+          # Update package.json
+          npm version $NEW_VERSION --no-git-tag-version
+          
+          echo "new-version=$NEW_VERSION" >> $GITHUB_OUTPUT
+      
+      - name: Generate changelog
+        if: steps.analyze.outputs.bump != 'none'
+        run: |
+          echo "Generating changelog entries..."
+          node scripts/generate-changelog.js ${{ steps.last-tag.outputs.last-tag }}
+        env:
+          NEW_VERSION: ${{ steps.update-version.outputs.new-version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Commit version changes
+        if: steps.analyze.outputs.bump != 'none'
+        id: commit
+        run: |
+          git add package.json package-lock.json CHANGELOG.md
+          git commit -m "chore(release): bump version to ${{ steps.update-version.outputs.new-version }} [skip ci]"
+          git push origin main
+          
+          COMMIT_SHA=$(git rev-parse HEAD)
+          echo "commit-sha=$COMMIT_SHA" >> $GITHUB_OUTPUT
+      
+      - name: Create and push tag
+        if: steps.analyze.outputs.bump != 'none'
+        run: |
+          TAG_NAME="v${{ steps.update-version.outputs.new-version }}"
+          echo "Creating tag $TAG_NAME"
+          
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          git push origin "$TAG_NAME"
+          
+          echo "✅ Version bumped to ${{ steps.update-version.outputs.new-version }}"
+          echo "✅ Tag $TAG_NAME created and pushed"
+      
+      - name: Create release notes summary
+        if: steps.analyze.outputs.bump != 'none'
+        run: |
+          echo "## 🎉 Version ${{ steps.update-version.outputs.new-version }} Released" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version Bump:** ${{ steps.analyze.outputs.bump }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Previous Version:** ${{ steps.current-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**New Version:** ${{ steps.update-version.outputs.new-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** v${{ steps.update-version.outputs.new-version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Changes" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          git log --oneline v${{ steps.current-version.outputs.version }}..HEAD >> $GITHUB_STEP_SUMMARY || echo "No previous tag found" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+      
+      - name: No version bump needed
+        if: steps.analyze.outputs.bump == 'none'
+        run: |
+          echo "ℹ️ No version bump needed based on commit messages" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Current Version:** ${{ steps.current-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To trigger a version bump, use conventional commit messages:" >> $GITHUB_STEP_SUMMARY
+          echo "- \`feat:\` for minor version bump" >> $GITHUB_STEP_SUMMARY
+          echo "- \`fix:\` for patch version bump" >> $GITHUB_STEP_SUMMARY
+          echo "- \`BREAKING CHANGE:\` or \`!\` for major version bump" >> $GITHUB_STEP_SUMMARY
