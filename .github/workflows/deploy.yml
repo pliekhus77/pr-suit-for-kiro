@@ -315,6 +315,30 @@ jobs:
             exit 0
           fi
       
+      - name: Post success comment on release
+        if: steps.publish.outputs.publish-success == 'true' && steps.verify.outputs.verify-success == 'true'
+        run: |
+          VERSION="${{ steps.extract-version.outputs.version }}"
+          RELEASE_ID="${{ github.event.release.id }}"
+          MARKETPLACE_URL="https://marketplace.visualstudio.com/items?itemName=pragmatic-rhino.pragmatic-rhino-suit"
+          WORKFLOW_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          FILE_SIZE="${{ steps.verify-artifact.outputs.file-size }}"
+          
+          echo "📝 Posting success comment to release..."
+          
+          # Post comment with deployment information
+          node scripts/post-release-comment.js \
+            "$RELEASE_ID" \
+            "$VERSION" \
+            "$MARKETPLACE_URL" \
+            --file-size "$FILE_SIZE" \
+            --workflow-url "$WORKFLOW_URL"
+          
+          echo "✅ Success comment posted to release"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+      
       - name: Generate deployment summary
         if: always()
         run: |
@@ -338,6 +362,7 @@ jobs:
             echo "- **Marketplace:** [$MARKETPLACE_URL]($MARKETPLACE_URL)" >> $GITHUB_STEP_SUMMARY
             if [ "${{ steps.verify.outputs.verify-success }}" == "true" ]; then
               echo "- **Verification:** ✅ Confirmed live on marketplace" >> $GITHUB_STEP_SUMMARY
+              echo "- **Release Comment:** ✅ Success comment posted" >> $GITHUB_STEP_SUMMARY
             else
               echo "- **Verification:** ⚠️ Could not confirm (may need manual check)" >> $GITHUB_STEP_SUMMARY
             fi
@@ -351,8 +376,9 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             if [ "${{ steps.verify.outputs.verify-success }}" == "true" ]; then
               echo "1. ✅ Extension is confirmed live on the marketplace" >> $GITHUB_STEP_SUMMARY
-              echo "2. Test installation: \`code --install-extension pragmatic-rhino.pragmatic-rhino-suit\`" >> $GITHUB_STEP_SUMMARY
-              echo "3. Monitor marketplace metrics and user feedback" >> $GITHUB_STEP_SUMMARY
+              echo "2. ✅ Success comment posted to release" >> $GITHUB_STEP_SUMMARY
+              echo "3. Test installation: \`code --install-extension pragmatic-rhino.pragmatic-rhino-suit\`" >> $GITHUB_STEP_SUMMARY
+              echo "4. Monitor marketplace metrics and user feedback" >> $GITHUB_STEP_SUMMARY
             else
               echo "1. ⚠️ Manually verify the extension is live: [$MARKETPLACE_URL]($MARKETPLACE_URL)" >> $GITHUB_STEP_SUMMARY
               echo "2. Wait 5-10 minutes if not yet visible (marketplace propagation delay)" >> $GITHUB_STEP_SUMMARY
