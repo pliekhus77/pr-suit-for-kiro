@@ -9,6 +9,7 @@
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/pliekhus77/pr-suit-for-kiro)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Build Status](https://github.com/pliekhus77/pr-suit-for-kiro/workflows/Build/badge.svg)](https://github.com/pliekhus77/pr-suit-for-kiro/actions/workflows/build.yml)
 [![Coverage Status](https://coveralls.io/repos/github/pliekhus77/pr-suit-for-kiro/badge.svg?branch=main)](https://coveralls.io/github/pliekhus77/pr-suit-for-kiro?branch=main)
 [![codecov](https://codecov.io/gh/pliekhus77/pr-suit-for-kiro/branch/main/graph/badge.svg)](https://codecov.io/gh/pliekhus77/pr-suit-for-kiro)
 [![Test Coverage](https://img.shields.io/badge/coverage-80%25-green.svg)](https://github.com/pliekhus77/pr-suit-for-kiro)
@@ -211,6 +212,71 @@ your-project/
 ├── frameworks/                      # Framework references (optional)
 └── ...
 ```
+
+## 🚀 CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and deployment to the VS Code Marketplace.
+
+### Pipeline Overview
+
+```
+Commit → Build → Test → Package → Deploy → Monitor
+```
+
+**Automated Workflows:**
+- **Build**: Runs on every push - compiles TypeScript, runs tests, validates coverage (80%+)
+- **PR Quality Gates**: Runs on pull requests - security scanning, version validation, status reporting
+- **Version**: Runs on main branch merge - analyzes commits, bumps version, generates changelog
+- **Package**: Runs on version tag - creates VSIX package, validates structure, uploads artifacts
+- **Deploy**: Runs on release - publishes to VS Code Marketplace, verifies deployment
+- **Rollback**: Manual trigger - rolls back to previous version if needed
+
+### Build Status
+
+| Workflow | Status | Description |
+|----------|--------|-------------|
+| Build | [![Build](https://github.com/pliekhus77/pr-suit-for-kiro/workflows/Build/badge.svg)](https://github.com/pliekhus77/pr-suit-for-kiro/actions/workflows/build.yml) | Compile, test, and validate |
+| PR Quality Gates | [![PR Quality](https://github.com/pliekhus77/pr-suit-for-kiro/workflows/PR%20Quality%20Gates/badge.svg)](https://github.com/pliekhus77/pr-suit-for-kiro/actions/workflows/pr-quality-gates.yml) | Security and quality checks |
+| Package | [![Package](https://github.com/pliekhus77/pr-suit-for-kiro/workflows/Package/badge.svg)](https://github.com/pliekhus77/pr-suit-for-kiro/actions/workflows/package.yml) | Create VSIX package |
+| Deploy | [![Deploy](https://github.com/pliekhus77/pr-suit-for-kiro/workflows/Deploy/badge.svg)](https://github.com/pliekhus77/pr-suit-for-kiro/actions/workflows/deploy.yml) | Publish to marketplace |
+
+### Deployment Process
+
+1. **Commit with Conventional Commits** (e.g., `feat:`, `fix:`, `BREAKING CHANGE:`)
+2. **Merge to main** - Version workflow analyzes commits and creates version tag
+3. **Version tag pushed** - Package workflow creates VSIX artifact
+4. **Create GitHub Release** - Deploy workflow publishes to VS Code Marketplace
+5. **Verification** - Automated checks confirm extension is live
+
+### Deployment Documentation
+
+- **Secrets Setup**: [docs/deployment/SECRETS.md](docs/deployment/SECRETS.md)
+- **Deployment Runbook**: [docs/deployment/RUNBOOK.md](docs/deployment/RUNBOOK.md)
+- **Troubleshooting**: [docs/deployment/TROUBLESHOOTING.md](docs/deployment/TROUBLESHOOTING.md)
+- **Onboarding Checklist**: [docs/deployment/ONBOARDING_CHECKLIST.md](docs/deployment/ONBOARDING_CHECKLIST.md)
+
+### Manual Deployment
+
+If needed, you can manually trigger deployment:
+
+```bash
+# Create a release through GitHub UI or CLI
+gh release create v1.0.0 --title "Release 1.0.0" --notes "Release notes here"
+
+# Or manually publish with vsce
+vsce publish
+```
+
+### Rollback
+
+To rollback to a previous version:
+
+1. Go to Actions → Rollback workflow
+2. Click "Run workflow"
+3. Enter the version to rollback to (e.g., `1.0.0`)
+4. Confirm execution
+
+See [docs/deployment/RUNBOOK.md](docs/deployment/RUNBOOK.md) for detailed rollback procedures.
 
 ## 🤝 Contributing
 

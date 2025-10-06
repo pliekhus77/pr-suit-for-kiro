@@ -420,7 +420,7 @@ This implementation plan breaks down the GitHub Actions CI/CD pipeline into disc
   - Document team roles and responsibilities
   - _Requirements: 10.7_
 
-- [ ] 11.6 Update main README
+- [x] 11.6 Update main README
   - Add CI/CD pipeline overview
   - Add badges for build status
   - Link to deployment documentation
