@@ -1,0 +1,2 @@
+# This file ensures the workflows directory is tracked by git
+# Workflow files will be added as part of the CI/CD implementation
