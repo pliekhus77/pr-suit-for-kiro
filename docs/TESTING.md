@@ -459,6 +459,15 @@ jobs:
 - **Keep tests fast** (unit tests < 100ms each)
 - **Document complex test scenarios**
 
+## Detailed Documentation
+
+For more detailed information, see:
+
+- **[Test Structure and Organization](testing/TEST_STRUCTURE.md)** - How tests are organized in the project
+- **[Running Tests Guide](testing/RUNNING_TESTS.md)** - Comprehensive guide on running different test suites
+- **[Testing Guidelines for Contributors](testing/CONTRIBUTING_TESTS.md)** - Best practices for writing tests
+- **[Test Troubleshooting Guide](testing/TROUBLESHOOTING.md)** - Solutions for common test failures
+
 ## Resources
 
 - [VS Code Extension Testing](https://code.visualstudio.com/api/working-with-extensions/testing-extension)
