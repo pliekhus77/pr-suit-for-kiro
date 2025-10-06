@@ -22,7 +22,7 @@ This implementation plan breaks down the GitHub Actions CI/CD pipeline into disc
   - Configure test file patterns
   - _Requirements: All workflows_
 
-- [ ] 1.2 Document required GitHub secrets
+- [x] 1.2 Document required GitHub secrets
   - Create `docs/deployment/SECRETS.md` with setup instructions
   - Document VSCE_PAT creation process
   - Document secret rotation procedures
