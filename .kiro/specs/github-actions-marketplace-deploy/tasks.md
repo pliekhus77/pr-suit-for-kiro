@@ -98,7 +98,7 @@ This implementation plan breaks down the GitHub Actions CI/CD pipeline into disc
   - Check version increment from base branch
   - _Requirements: 2.6_
 
-- [ ] 3.3.1 Write unit tests for version validation
+- [x] 3.3.1 Write unit tests for version validation
   - Create `scripts/__tests__/validate-version.test.js`
   - Test valid semantic version detection
   - Test invalid version format detection
