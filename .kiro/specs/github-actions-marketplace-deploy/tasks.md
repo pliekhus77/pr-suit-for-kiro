@@ -136,14 +136,14 @@ This implementation plan breaks down the GitHub Actions CI/CD pipeline into disc
   - Validate version format
   - _Requirements: 3.5_
 
-- [ ] 4.3 Create changelog generator
+- [x] 4.3 Create changelog generator
   - Create `scripts/generate-changelog.js`
   - Parse commits since last version
   - Generate CHANGELOG.md entries
   - Format according to Keep a Changelog
   - _Requirements: 3.6_
 
-- [ ] 4.3.1 Write unit tests for changelog generator
+- [x] 4.3.1 Write unit tests for changelog generator
   - Create `scripts/__tests__/generate-changelog.test.js`
   - Test changelog entry generation from commits
   - Test grouping by commit type (feat, fix, chore)
