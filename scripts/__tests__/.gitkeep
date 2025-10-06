@@ -1,0 +1,2 @@
+# This file ensures the __tests__ directory is tracked by git
+# Test files will be added here as scripts are implemented

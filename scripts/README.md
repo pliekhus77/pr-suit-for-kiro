@@ -35,13 +35,16 @@ All scripts include comprehensive unit tests in the `__tests__/` directory. Test
 
 ```bash
 # Run all script tests
-npm test -- scripts/__tests__
+npm run test:scripts
+
+# Run tests in watch mode
+npm run test:scripts:watch
 
 # Run tests with coverage
-npm test -- --coverage scripts/__tests__
+npm run test:scripts:coverage
 
 # Run specific test file
-npm test -- scripts/__tests__/validate-version.test.js
+npm run test:scripts -- __tests__/validate-version.test.js
 ```
 
 ### Coverage Requirements
