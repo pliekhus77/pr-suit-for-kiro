@@ -152,3 +152,65 @@ jobs:
           elif [ "${{ steps.coverage.outcome }}" == "failure" ]; then
             echo "❌ Code coverage below 80% threshold" >> $GITHUB_STEP_SUMMARY
           fi
+          
+      - name: Generate build status summary
+        if: always()
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Build Status Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          
+          # Compilation status
+          if [ "${{ steps.lint.outcome }}" == "success" ]; then
+            echo "| TypeScript Compilation | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| TypeScript Compilation | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Linting status
+          if [ "${{ steps.lint.outcome }}" == "success" ]; then
+            echo "| ESLint | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| ESLint | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Test status
+          if [ "${{ steps.test.outcome }}" == "success" ]; then
+            echo "| Unit Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.test.outcome }}" == "failure" ]; then
+            echo "| Unit Tests | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Unit Tests | ⚠️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Coverage status
+          if [ "${{ steps.coverage.outcome }}" == "success" ]; then
+            echo "| Code Coverage (≥80%) | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.coverage.outcome }}" == "failure" ]; then
+            echo "| Code Coverage (≥80%) | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Code Coverage (≥80%) | ⚠️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Overall build status
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "### ✅ Build Successful" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "All quality checks passed. The build is ready for deployment." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Build Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "One or more quality checks failed. Please review the errors above and fix them before proceeding." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow Run:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
