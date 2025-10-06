@@ -1,0 +1,195 @@
+name: PR Quality Gates
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+      - develop
+
+jobs:
+  quality-gates:
+    name: PR Quality Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for version validation
+        
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Compile TypeScript
+        id: compile
+        run: npm run compile
+        continue-on-error: false
+        
+      - name: Run ESLint
+        id: lint
+        run: npm run lint
+        continue-on-error: false
+        
+      - name: Run tests with coverage
+        id: test
+        run: npm test -- --coverage --coverageReporters=text --coverageReporters=text-summary --coverageReporters=json-summary --coverageReporters=lcov --coverageReporters=html --coverageReporters=cobertura
+        continue-on-error: false
+        
+      - name: Check coverage threshold
+        id: coverage
+        if: always() && steps.test.outcome == 'success'
+        run: |
+          # Extract coverage percentages from coverage-summary.json
+          if [ -f "coverage/coverage-summary.json" ]; then
+            LINES=$(jq '.total.lines.pct' coverage/coverage-summary.json)
+            STATEMENTS=$(jq '.total.statements.pct' coverage/coverage-summary.json)
+            FUNCTIONS=$(jq '.total.functions.pct' coverage/coverage-summary.json)
+            BRANCHES=$(jq '.total.branches.pct' coverage/coverage-summary.json)
+            
+            echo "### Code Coverage" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Coverage | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|----------|--------|" >> $GITHUB_STEP_SUMMARY
+            
+            # Check each metric against 80% threshold
+            THRESHOLD=80
+            FAILED=0
+            
+            if (( $(echo "$LINES >= $THRESHOLD" | bc -l) )); then
+              echo "| Lines | ${LINES}% | ✅ |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Lines | ${LINES}% | ❌ |" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+            
+            if (( $(echo "$STATEMENTS >= $THRESHOLD" | bc -l) )); then
+              echo "| Statements | ${STATEMENTS}% | ✅ |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Statements | ${STATEMENTS}% | ❌ |" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+            
+            if (( $(echo "$FUNCTIONS >= $THRESHOLD" | bc -l) )); then
+              echo "| Functions | ${FUNCTIONS}% | ✅ |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Functions | ${FUNCTIONS}% | ❌ |" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+            
+            if (( $(echo "$BRANCHES >= $THRESHOLD" | bc -l) )); then
+              echo "| Branches | ${BRANCHES}% | ✅ |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Branches | ${BRANCHES}% | ❌ |" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+            
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            if [ $FAILED -eq 1 ]; then
+              echo "❌ **Coverage threshold not met** - Minimum 80% required for all metrics" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            else
+              echo "✅ **All coverage thresholds met** - Minimum 80% achieved" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "❌ Coverage report not found" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          
+      - name: Upload test results
+        if: always() && steps.test.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-test-results-${{ github.event.pull_request.number }}
+          path: |
+            coverage/coverage-summary.json
+            coverage/cobertura-coverage.xml
+            coverage/lcov.info
+          retention-days: 30
+          if-no-files-found: warn
+          
+      - name: Upload coverage reports
+        if: always() && steps.test.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-coverage-reports-${{ github.event.pull_request.number }}
+          path: |
+            coverage/
+            !coverage/**/*.js
+          retention-days: 30
+          
+      - name: Generate PR quality summary
+        if: always()
+        run: |
+          echo "# 🔍 Pull Request Quality Gates" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**PR #${{ github.event.pull_request.number }}:** ${{ github.event.pull_request.title }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.head_ref }}\` → \`${{ github.base_ref }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Author:** @${{ github.event.pull_request.user.login }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Quality Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          
+          # Compilation status
+          if [ "${{ steps.compile.outcome }}" == "success" ]; then
+            echo "| TypeScript Compilation | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| TypeScript Compilation | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Linting status
+          if [ "${{ steps.lint.outcome }}" == "success" ]; then
+            echo "| ESLint | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| ESLint | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Test status
+          if [ "${{ steps.test.outcome }}" == "success" ]; then
+            echo "| Unit Tests | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.test.outcome }}" == "failure" ]; then
+            echo "| Unit Tests | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Unit Tests | ⚠️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Coverage status
+          if [ "${{ steps.coverage.outcome }}" == "success" ]; then
+            echo "| Code Coverage (≥80%) | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.coverage.outcome }}" == "failure" ]; then
+            echo "| Code Coverage (≥80%) | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Code Coverage (≥80%) | ⚠️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Overall status
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "### ✅ All Quality Gates Passed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "This pull request meets all quality standards and is ready for review." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Quality Gates Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "This pull request does not meet quality standards. Please fix the issues above before requesting review." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Note:** Merging is blocked until all quality gates pass." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow Run:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** [\`${{ github.event.pull_request.head.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha }})" >> $GITHUB_STEP_SUMMARY
