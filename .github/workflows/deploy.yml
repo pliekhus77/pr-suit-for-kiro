@@ -339,6 +339,32 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
       
+      - name: Collect deployment metrics
+        id: metrics
+        if: steps.publish.outputs.publish-success == 'true' && steps.verify.outputs.verify-success == 'true'
+        run: |
+          VERSION="${{ steps.extract-version.outputs.version }}"
+          FILE_SIZE_MB=$(echo "scale=2; ${{ steps.verify-artifact.outputs.file-size }} / 1024 / 1024" | bc)
+          WORKFLOW_START="${{ github.event.repository.pushed_at }}"
+          WORKFLOW_END=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          echo "📊 Collecting deployment metrics..."
+          
+          # Calculate deployment duration
+          START_TIMESTAMP=$(date -d "$WORKFLOW_START" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$WORKFLOW_START" +%s)
+          END_TIMESTAMP=$(date -d "$WORKFLOW_END" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$WORKFLOW_END" +%s)
+          DURATION_SECONDS=$((END_TIMESTAMP - START_TIMESTAMP))
+          DURATION_MINUTES=$((DURATION_SECONDS / 60))
+          DURATION_REMAINING=$((DURATION_SECONDS % 60))
+          
+          echo "deployment-duration=${DURATION_MINUTES}m ${DURATION_REMAINING}s" >> $GITHUB_OUTPUT
+          echo "deployment-duration-seconds=$DURATION_SECONDS" >> $GITHUB_OUTPUT
+          echo "package-size-mb=$FILE_SIZE_MB" >> $GITHUB_OUTPUT
+          
+          echo "✅ Metrics collected:"
+          echo "  - Duration: ${DURATION_MINUTES}m ${DURATION_REMAINING}s"
+          echo "  - Package Size: ${FILE_SIZE_MB} MB"
+      
       - name: Send success notification
         if: steps.publish.outputs.publish-success == 'true' && steps.verify.outputs.verify-success == 'true'
         run: |
@@ -346,23 +372,51 @@ jobs:
           MARKETPLACE_URL="https://marketplace.visualstudio.com/items?itemName=pragmatic-rhino.pragmatic-rhino-suit"
           WORKFLOW_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           RELEASE_URL="${{ github.event.release.html_url }}"
-          FILE_SIZE_MB=$(echo "scale=2; ${{ steps.verify-artifact.outputs.file-size }} / 1024 / 1024" | bc)
+          DEPLOYMENT_DURATION="${{ steps.metrics.outputs.deployment-duration }}"
+          PACKAGE_SIZE="${{ steps.metrics.outputs.package-size-mb }}"
           
           echo "📢 Sending deployment success notification..."
+          
+          # Build detailed message
+          DETAILS="Version: $VERSION | Package Size: ${PACKAGE_SIZE} MB | Duration: $DEPLOYMENT_DURATION | Status: Verified on marketplace"
+          
+          # Send notification using helper script
+          node scripts/send-notification.js \
+            --type deploy \
+            --status success \
+            --message "🚀 Extension v$VERSION deployed successfully to VS Code Marketplace" \
+            --details "$DETAILS" \
+            --version "$VERSION" \
+            --marketplace "$MARKETPLACE_URL" \
+            --url "$WORKFLOW_URL" \
+            --channel github
+          
           echo ""
           echo "✅ Deployment Successful!"
-          echo "Version: $VERSION"
-          echo "Marketplace: $MARKETPLACE_URL"
-          echo "Release: $RELEASE_URL"
-          echo "Workflow: $WORKFLOW_URL"
-          echo "Package Size: ${FILE_SIZE_MB} MB"
+          echo ""
+          echo "📦 Extension Details:"
+          echo "  - Version: $VERSION"
+          echo "  - Package Size: ${PACKAGE_SIZE} MB"
+          echo ""
+          echo "🔗 Links:"
+          echo "  - Marketplace: $MARKETPLACE_URL"
+          echo "  - Release: $RELEASE_URL"
+          echo "  - Workflow: $WORKFLOW_URL"
+          echo ""
+          echo "⏱️ Deployment Metrics:"
+          echo "  - Duration: $DEPLOYMENT_DURATION"
+          echo "  - Status: ✅ Verified on marketplace"
           echo ""
           echo "The extension has been successfully deployed and verified on the VS Code Marketplace."
           echo ""
-          echo "Next steps:"
-          echo "1. Test installation: code --install-extension pragmatic-rhino.pragmatic-rhino-suit"
-          echo "2. Monitor marketplace metrics and user feedback"
-          echo "3. Check for any issues reported by users"
+          echo "📝 Next steps:"
+          echo "  1. Test installation: code --install-extension pragmatic-rhino.pragmatic-rhino-suit"
+          echo "  2. Monitor marketplace metrics and user feedback"
+          echo "  3. Check for any issues reported by users"
+          echo "  4. Review deployment metrics for optimization opportunities"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
       
       - name: Send failure notification
         if: failure()
@@ -419,7 +473,17 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### ⏱️ Deployment Metrics" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- **Workflow Duration:** ${{ job.status == 'success' && 'Completed' || 'Failed' }}" >> $GITHUB_STEP_SUMMARY
+            if [ -n "${{ steps.metrics.outputs.deployment-duration }}" ]; then
+              echo "- **Deployment Duration:** ${{ steps.metrics.outputs.deployment-duration }} (${{ steps.metrics.outputs.deployment-duration-seconds }}s)" >> $GITHUB_STEP_SUMMARY
+              DURATION_SECONDS=${{ steps.metrics.outputs.deployment-duration-seconds }}
+              if [ $DURATION_SECONDS -le 600 ]; then
+                echo "- **Performance:** ✅ Within 10-minute target" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "- **Performance:** ⚠️ Exceeds 10-minute target" >> $GITHUB_STEP_SUMMARY
+              fi
+            else
+              echo "- **Deployment Duration:** Completed" >> $GITHUB_STEP_SUMMARY
+            fi
             echo "- **VSIX Size:** $(echo "scale=2; ${{ steps.verify-artifact.outputs.file-size }} / 1024 / 1024" | bc) MB" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### 📝 Next Steps" >> $GITHUB_STEP_SUMMARY
