@@ -13,103 +13,147 @@ This implementation plan creates a comprehensive Application Performance Monitor
   - Create document outline with all 12 major sections as placeholders
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 2. Write Core APM Concepts section
-  - [ ] 2.1 Document the three pillars of observability (metrics, logs, traces)
+- [x] 2. Write Core APM Concepts section
+  - [x] 2.1 Document the three pillars of observability (metrics, logs, traces)
     - Explain each pillar with definitions and use cases
     - Provide examples of when to use each pillar
     - Include visual representation (table or diagram)
     - _Requirements: 1.1_
-  - [ ] 2.2 Define performance metrics standards and "good" metrics
+
+  - [x] 2.2 Define performance metrics standards and "good" metrics
     - Document RED metrics (Rate, Errors, Duration)
     - Document USE metrics (Utilization, Saturation, Errors)
     - Provide guidance on what constitutes good performance
     - _Requirements: 1.2, 3.1_
-  - [ ] 2.3 Create monitoring tool selection criteria
+
+  - [x] 2.3 Create monitoring tool selection criteria
     - Decision matrix for tool selection
     - Comparison of managed services vs third-party tools
     - Cost vs features trade-offs
     - _Requirements: 1.3_
-  - [ ] 2.4 Explain synthetic vs real user monitoring (RUM)
+
+  - [x] 2.4 Explain synthetic vs real user monitoring (RUM)
     - Define each monitoring type
     - Provide use cases and examples
     - Document when to use each approach
     - _Requirements: 1.4_
-  - [ ] 2.5 Define instrumentation levels
+
+  - [x] 2.5 Define instrumentation levels
     - Application-level instrumentation
     - Infrastructure-level instrumentation
     - Business-level instrumentation
     - _Requirements: 1.5_
 
-- [ ] 3. Write Cloud Platform APM Services section
-  - [ ] 3.1 Document AWS APM services
+- [x] 3. Write Cloud Platform APM Services section
+  - [x] 3.1 Document AWS APM services
     - CloudWatch (metrics, logs, alarms) with configuration examples
     - X-Ray (distributed tracing) with setup patterns
     - Third-party integrations (Datadog, New Relic, Dynatrace)
     - Cost considerations and optimization strategies
     - _Requirements: 2.1, 2.4, 2.5_
-  - [ ] 3.2 Document Azure APM services
+
+  - [x] 3.2 Document Azure APM services
     - Application Insights (APM, tracing, analytics) with configuration examples
     - Azure Monitor (metrics, alerts, workbooks) with setup patterns
     - Log Analytics (centralized logging, KQL queries) with query examples
     - Cost considerations and optimization strategies
     - _Requirements: 2.2, 2.4, 2.5_
-  - [ ] 3.3 Create platform comparison decision matrix
+
+  - [x] 3.3 Create platform comparison decision matrix
     - Service-to-service comparison table
     - Use case to service mapping
     - Cost-benefit analysis framework
     - Platform selection decision tree
     - _Requirements: 2.3_
 
-- [ ] 4. Write Metrics Collection and Analysis section
-  - [ ] 4.1 Document metrics categorization framework
+- [x] 4. Write Metrics Collection and Analysis section
+
+
+
+
+
+  - [x] 4.1 Document metrics categorization framework
+
+
     - RED metrics with .NET code examples
     - USE metrics with .NET code examples
     - Business metrics with instrumentation patterns
     - _Requirements: 3.1, 3.5_
-  - [ ] 4.2 Define collection intervals and retention policies
+  - [x] 4.2 Define collection intervals and retention policies
+
+
     - Recommended collection intervals by metric type
     - Retention policy guidelines
     - Storage cost optimization strategies
     - _Requirements: 3.2_
-  - [ ] 4.3 Explain percentiles vs averages analysis
+  - [x] 4.3 Explain percentiles vs averages analysis
+
+
     - When to use p50, p95, p99 vs averages
     - Code examples for calculating percentiles
     - Visualization and interpretation guidance
     - _Requirements: 3.3_
-  - [ ] 4.4 Define SLI/SLO/SLA concepts and implementation
+  - [x] 4.4 Define SLI/SLO/SLA concepts and implementation
+
+
     - Definitions and differences
     - How to define SLIs for your application
     - Setting realistic SLOs
     - SLA considerations
     - _Requirements: 3.4_
-  - [ ] 4.5 Document .NET performance counters and custom metrics
+  - [x] 4.5 Document .NET performance counters and custom metrics
+
+
     - Key .NET performance counters to monitor
     - Custom metrics instrumentation with Application Insights
     - Custom metrics instrumentation with CloudWatch
     - _Requirements: 3.5_
 
-- [ ] 5. Write Distributed Tracing section
-  - [ ] 5.1 Explain correlation IDs and trace context propagation
+- [-] 5. Write Distributed Tracing section
+
+
+
+  - [x] 5.1 Explain correlation IDs and trace context propagation
     - W3C Trace Context standard
     - Correlation ID patterns
     - Context propagation across service boundaries
     - _Requirements: 4.1_
-  - [ ] 5.2 Provide OpenTelemetry .NET implementation patterns
+  - [x] 5.2 Provide OpenTelemetry .NET implementation patterns
+
+
+
+
+
+
     - Setup and configuration code examples
     - Activity/Span creation patterns
     - Instrumentation for ASP.NET Core, HttpClient, SQL
     - _Requirements: 4.2_
-  - [ ] 5.3 Define span creation and annotation best practices
+
+  - [x] 5.3 Define span creation and annotation best practices
+
+
+
+
+
     - When to create spans
     - How to annotate spans with tags and events
     - Error recording patterns
+
     - _Requirements: 4.3_
-  - [ ] 5.4 Document bottleneck identification techniques
+  - [x] 5.4 Document bottleneck identification techniques
+
+
+
+
+
     - How to analyze trace data
     - Identifying latency issues
+
     - Finding performance bottlenecks
     - _Requirements: 4.4_
-  - [ ] 5.5 Document cloud service tracing integration
+  - [x] 5.5 Document cloud service tracing integration
+
     - AWS X-Ray integration with code examples
     - Azure Application Insights integration with code examples
     - Exporter configuration patterns

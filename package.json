@@ -25,7 +25,6 @@
     "bdd",
     "architecture"
   ],
-  "icon": "resources/icon.png",
   "activationEvents": [
     "workspaceContains:.kiro/"
   ],
@@ -242,7 +241,8 @@
     "test:bdd:debug": "cucumber-js --profile debug",
     "test:bdd:watch": "nodemon --watch tests/bdd --ext feature,ts --exec npm run test:bdd",
     "playwright:install": "playwright install",
-    "prepare": "husky"
+    "package:vsix": "vsce package",
+    "publish": "vsce publish"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^12.2.0",
@@ -257,6 +257,7 @@
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
     "@vscode/test-electron": "^2.3.8",
+    "@vscode/vsce": "^3.6.2",
     "eslint": "^8.56.0",
     "glob": "^10.3.10",
     "husky": "^9.1.7",
