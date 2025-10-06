@@ -119,13 +119,36 @@ jobs:
           FILE_SIZE=$(stat -f%z "$VSIX_FILE" 2>/dev/null || stat -c%s "$VSIX_FILE")
           echo "✅ VSIX file exists: $VSIX_FILE ($FILE_SIZE bytes)"
       
+      - name: Validate VSIX package
+        run: |
+          VSIX_FILE="${{ steps.package.outputs.vsix-file }}"
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          
+          echo "🔍 Validating VSIX package..."
+          node scripts/validate-vsix.js "$VSIX_FILE" "$VERSION"
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ VSIX validation passed"
+          else
+            echo "❌ VSIX validation failed"
+            exit 1
+          fi
+      
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vsix-package
+          name: vsix-package-${{ needs.validate-tag.outputs.version }}
           path: ${{ steps.package.outputs.vsix-file }}
           retention-days: 90
           if-no-files-found: error
+          compression-level: 6
+        env:
+          # Add metadata as environment variables for tracking
+          ARTIFACT_VERSION: ${{ needs.validate-tag.outputs.version }}
+          ARTIFACT_TAG: ${{ github.ref_name }}
+          ARTIFACT_COMMIT: ${{ github.sha }}
+          ARTIFACT_RUN_ID: ${{ github.run_id }}
+          ARTIFACT_RUN_NUMBER: ${{ github.run_number }}
       
       - name: Generate package summary
         if: always()
@@ -142,9 +165,15 @@ jobs:
             echo "**VSIX File:** ${{ steps.package.outputs.vsix-file }}" >> $GITHUB_STEP_SUMMARY
             echo "**File Size:** ${FILE_SIZE_MB} MB" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "✅ **Status:** Package created successfully" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Status:** Package created and validated successfully" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "The VSIX file has been uploaded as an artifact with 90-day retention." >> $GITHUB_STEP_SUMMARY
+            echo "### 📤 Artifact Details" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Artifact Name:** vsix-package-${{ needs.validate-tag.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Retention Period:** 90 days" >> $GITHUB_STEP_SUMMARY
+            echo "- **Validation:** Passed (structure, version, file size)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The VSIX file has been uploaded as an artifact and is ready for deployment." >> $GITHUB_STEP_SUMMARY
           else
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "❌ **Status:** Package creation failed" >> $GITHUB_STEP_SUMMARY

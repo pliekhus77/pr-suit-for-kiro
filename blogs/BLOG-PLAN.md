@@ -1,7 +1,22 @@
-# Blog Plan: Pragmatic Rhino SUIT Series
+# Getting Started & Blog Strategy: Pragmatic Rhino SUIT
 
-## Overview
-A comprehensive blog series introducing Amazon Q, Kiro, and the SUIT (Standards-Unified Integration Toolkit) framework library, followed by deep dives into each framework and tool selection rationale.
+## Getting Started Guide
+
+### Quick Start (5 minutes)
+1. **Install SUIT Extension** in VS Code
+2. **Open/Create Kiro Workspace** (contains `.kiro/` directory)
+3. **Run Command**: `Pragmatic Rhino SUIT: Browse Frameworks`
+4. **Install Recommended**: TDD/BDD + Cloud Strategy (AWS/Azure)
+5. **Start Building** - Kiro now follows framework guidance
+
+### Essential First Steps
+- **New Project**: Use `Initialize Workspace` command
+- **Existing Project**: Use `Browse Frameworks` command  
+- **Team Setup**: Create custom steering documents
+- **Validation**: Run `Validate Steering Document` before commits
+
+## Blog Strategy Overview
+Strategic content plan to establish SUIT as the go-to framework management solution for AI-assisted development, targeting developers, architects, and engineering leaders.
 
 ---
 
