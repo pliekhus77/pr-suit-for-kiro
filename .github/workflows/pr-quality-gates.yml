@@ -392,3 +392,40 @@ jobs:
                 body: commentBody
               });
             }
+      
+      - name: Send failure notification
+        if: failure()
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          WORKFLOW_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          
+          echo "📢 Sending PR quality gates failure notification..."
+          echo ""
+          echo "❌ PR Quality Gates Failed!"
+          echo "PR: #$PR_NUMBER - $PR_TITLE"
+          echo "Author: @$PR_AUTHOR"
+          echo "Branch: ${{ github.head_ref }} → ${{ github.base_ref }}"
+          echo "Commit: ${{ github.event.pull_request.head.sha }}"
+          echo "Workflow: $WORKFLOW_URL"
+          echo "PR URL: $PR_URL"
+          echo ""
+          echo "The pull request does not meet quality standards."
+          echo ""
+          echo "Common failure reasons:"
+          echo "1. TypeScript compilation errors"
+          echo "2. ESLint violations"
+          echo "3. Test failures"
+          echo "4. Code coverage below 80% threshold"
+          echo "5. Security vulnerabilities (critical or high severity)"
+          echo "6. Invalid version format in package.json"
+          echo ""
+          echo "Next steps:"
+          echo "1. Review the failed quality checks in the PR comment"
+          echo "2. Fix the issues locally and test before pushing"
+          echo "3. Push the fixes to update the PR"
+          echo "4. Wait for quality gates to pass before requesting review"
+          echo ""
+          echo "Note: Merging is blocked until all quality gates pass."

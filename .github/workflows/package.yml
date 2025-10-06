@@ -185,3 +185,35 @@ jobs:
           echo "**Workflow Run:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
           echo "**Tag:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Send failure notification
+        if: failure()
+        run: |
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          TAG_NAME="${{ github.ref_name }}"
+          WORKFLOW_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+          echo "📢 Sending package workflow failure notification..."
+          echo ""
+          echo "❌ Package Workflow Failed!"
+          echo "Version: $VERSION"
+          echo "Tag: $TAG_NAME"
+          echo "Commit: ${{ github.sha }}"
+          echo "Triggered by: @${{ github.actor }}"
+          echo "Workflow: $WORKFLOW_URL"
+          echo ""
+          echo "The extension packaging workflow has failed."
+          echo ""
+          echo "Common failure reasons:"
+          echo "1. Invalid tag format (must be vX.Y.Z)"
+          echo "2. TypeScript compilation errors"
+          echo "3. vsce package command failures"
+          echo "4. VSIX validation failures"
+          echo "5. Missing or invalid dependencies"
+          echo ""
+          echo "Next steps:"
+          echo "1. Review the failed steps above for specific error messages"
+          echo "2. Verify the tag format is correct (vX.Y.Z)"
+          echo "3. Check that the code compiles successfully"
+          echo "4. Ensure package.json version matches the tag"
+          echo "5. Fix issues and create a new tag if needed"

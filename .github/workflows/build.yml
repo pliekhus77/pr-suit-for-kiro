@@ -214,3 +214,27 @@ jobs:
           echo "**Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
           echo "**Triggered by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Send failure notification
+        if: failure()
+        run: |
+          echo "📢 Sending build failure notification..."
+          echo ""
+          echo "❌ Build Failed!"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Triggered by: @${{ github.actor }}"
+          echo "Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo ""
+          echo "The build has failed. Please check the workflow logs for error details."
+          echo ""
+          echo "Common failure reasons:"
+          echo "1. TypeScript compilation errors"
+          echo "2. ESLint violations"
+          echo "3. Test failures"
+          echo "4. Code coverage below 80% threshold"
+          echo ""
+          echo "Next steps:"
+          echo "1. Review the failed steps above for specific error messages"
+          echo "2. Fix the issues locally and test before pushing"
+          echo "3. Push the fixes to trigger a new build"

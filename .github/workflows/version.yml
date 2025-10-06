@@ -146,3 +146,28 @@ jobs:
           echo "- \`feat:\` for minor version bump" >> $GITHUB_STEP_SUMMARY
           echo "- \`fix:\` for patch version bump" >> $GITHUB_STEP_SUMMARY
           echo "- \`BREAKING CHANGE:\` or \`!\` for major version bump" >> $GITHUB_STEP_SUMMARY
+      
+      - name: Send failure notification
+        if: failure()
+        run: |
+          echo "📢 Sending version workflow failure notification..."
+          echo ""
+          echo "❌ Version Workflow Failed!"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Triggered by: @${{ github.actor }}"
+          echo "Workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo ""
+          echo "The version management workflow has failed."
+          echo ""
+          echo "Common failure reasons:"
+          echo "1. Git configuration issues"
+          echo "2. Permission errors when pushing commits or tags"
+          echo "3. Changelog generation errors"
+          echo "4. Version analysis script failures"
+          echo ""
+          echo "Next steps:"
+          echo "1. Review the failed steps above for specific error messages"
+          echo "2. Check GitHub token permissions (contents: write required)"
+          echo "3. Verify commit message format follows conventional commits"
+          echo "4. Check for conflicts or issues with package.json"
