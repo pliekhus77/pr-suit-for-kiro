@@ -9,6 +9,9 @@
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/pliekhus77/pr-suit-for-kiro)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Coverage Status](https://coveralls.io/repos/github/pliekhus77/pr-suit-for-kiro/badge.svg?branch=main)](https://coveralls.io/github/pliekhus77/pr-suit-for-kiro?branch=main)
+[![codecov](https://codecov.io/gh/pliekhus77/pr-suit-for-kiro/branch/main/graph/badge.svg)](https://codecov.io/gh/pliekhus77/pr-suit-for-kiro)
+[![Test Coverage](https://img.shields.io/badge/coverage-80%25-green.svg)](https://github.com/pliekhus77/pr-suit-for-kiro)
 
 ## Overview
 

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "label": "coverage",
+  "message": "80%",
+  "color": "green",
+  "namedLogo": "jest",
+  "logoColor": "white"
+}

@@ -4,11 +4,23 @@ module.exports = {
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
   testPathIgnorePatterns: ['/node_modules/', '/out/', '/dist/', '/src/test/'],
+  collectCoverage: true,
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',
     '!src/**/__tests__/**',
-    '!src/test/**'
+    '!src/test/**',
+    '!src/**/__mocks__/**'
+  ],
+  coverageDirectory: 'coverage',
+  coverageReporters: [
+    'text',
+    'text-summary',
+    'html',
+    'lcov',
+    'json',
+    'json-summary',
+    'cobertura'
   ],
   coverageThreshold: {
     global: {
