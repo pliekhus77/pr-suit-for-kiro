@@ -339,6 +339,55 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
       
+      - name: Send success notification
+        if: steps.publish.outputs.publish-success == 'true' && steps.verify.outputs.verify-success == 'true'
+        run: |
+          VERSION="${{ steps.extract-version.outputs.version }}"
+          MARKETPLACE_URL="https://marketplace.visualstudio.com/items?itemName=pragmatic-rhino.pragmatic-rhino-suit"
+          WORKFLOW_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          RELEASE_URL="${{ github.event.release.html_url }}"
+          FILE_SIZE_MB=$(echo "scale=2; ${{ steps.verify-artifact.outputs.file-size }} / 1024 / 1024" | bc)
+          
+          echo "📢 Sending deployment success notification..."
+          echo ""
+          echo "✅ Deployment Successful!"
+          echo "Version: $VERSION"
+          echo "Marketplace: $MARKETPLACE_URL"
+          echo "Release: $RELEASE_URL"
+          echo "Workflow: $WORKFLOW_URL"
+          echo "Package Size: ${FILE_SIZE_MB} MB"
+          echo ""
+          echo "The extension has been successfully deployed and verified on the VS Code Marketplace."
+          echo ""
+          echo "Next steps:"
+          echo "1. Test installation: code --install-extension pragmatic-rhino.pragmatic-rhino-suit"
+          echo "2. Monitor marketplace metrics and user feedback"
+          echo "3. Check for any issues reported by users"
+      
+      - name: Send failure notification
+        if: failure()
+        run: |
+          VERSION="${{ steps.extract-version.outputs.version }}"
+          WORKFLOW_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          RELEASE_URL="${{ github.event.release.html_url }}"
+          
+          echo "📢 Sending deployment failure notification..."
+          echo ""
+          echo "❌ Deployment Failed!"
+          echo "Version: $VERSION"
+          echo "Release: $RELEASE_URL"
+          echo "Workflow: $WORKFLOW_URL"
+          echo ""
+          echo "The deployment to VS Code Marketplace has failed."
+          echo ""
+          echo "Troubleshooting steps:"
+          echo "1. Check the workflow logs for error details: $WORKFLOW_URL"
+          echo "2. Verify VSCE_PAT token is valid and has correct permissions"
+          echo "3. Check marketplace status: https://marketplace.visualstudio.com/"
+          echo "4. Consider using the rollback workflow if needed"
+          echo ""
+          echo "For detailed error information, review the failed steps above."
+      
       - name: Generate deployment summary
         if: always()
         run: |
@@ -363,6 +412,7 @@ jobs:
             if [ "${{ steps.verify.outputs.verify-success }}" == "true" ]; then
               echo "- **Verification:** ✅ Confirmed live on marketplace" >> $GITHUB_STEP_SUMMARY
               echo "- **Release Comment:** ✅ Success comment posted" >> $GITHUB_STEP_SUMMARY
+              echo "- **Notification:** ✅ Success notification sent" >> $GITHUB_STEP_SUMMARY
             else
               echo "- **Verification:** ⚠️ Could not confirm (may need manual check)" >> $GITHUB_STEP_SUMMARY
             fi
@@ -387,6 +437,8 @@ jobs:
             fi
           else
             echo "❌ **Status:** Deployment failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Notification:** ✅ Failure notification sent" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "See error details above for troubleshooting steps." >> $GITHUB_STEP_SUMMARY
           fi
