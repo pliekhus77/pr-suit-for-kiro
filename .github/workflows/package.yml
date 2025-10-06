@@ -1,0 +1,158 @@
+name: Package Extension
+
+# Trigger on version tag pushes
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Ensure only one package workflow runs at a time
+concurrency:
+  group: package-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-tag:
+    name: Validate Tag Format
+    runs-on: ubuntu-latest
+    
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+      is-valid: ${{ steps.validate.outputs.is-valid }}
+    
+    steps:
+      - name: Extract version from tag
+        id: extract
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          VERSION="${TAG_NAME#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+      
+      - name: Validate semantic version format
+        id: validate
+        run: |
+          VERSION="${{ steps.extract.outputs.version }}"
+          
+          # Regex for semantic versioning (MAJOR.MINOR.PATCH with optional pre-release and build metadata)
+          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
+            echo "✅ Valid semantic version: $VERSION"
+            echo "is-valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Invalid semantic version format: $VERSION"
+            echo "Expected format: MAJOR.MINOR.PATCH (e.g., 1.2.3)"
+            echo "is-valid=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      - name: Generate validation summary
+        if: always()
+        run: |
+          echo "## 🏷️ Tag Validation" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.extract.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.validate.outputs.is-valid }}" == "true" ]; then
+            echo "✅ **Status:** Valid semantic version" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status:** Invalid semantic version format" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please use semantic versioning format: MAJOR.MINOR.PATCH" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  package:
+    name: Build and Package VSIX
+    runs-on: ubuntu-latest
+    needs: validate-tag
+    
+    if: needs.validate-tag.outputs.is-valid == 'true'
+    
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install production dependencies
+        run: npm ci --production
+      
+      - name: Install dev dependencies for build
+        run: npm install --save-dev typescript @types/node @types/vscode
+      
+      - name: Compile TypeScript (production mode)
+        run: npm run compile
+        env:
+          NODE_ENV: production
+      
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+      
+      - name: Package extension
+        id: package
+        run: |
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          echo "Packaging extension version $VERSION..."
+          
+          vsce package --out "pragmatic-rhino-suit-${VERSION}.vsix"
+          
+          VSIX_FILE="pragmatic-rhino-suit-${VERSION}.vsix"
+          echo "vsix-file=$VSIX_FILE" >> $GITHUB_OUTPUT
+          echo "✅ VSIX created: $VSIX_FILE"
+      
+      - name: Verify VSIX file exists
+        run: |
+          VSIX_FILE="${{ steps.package.outputs.vsix-file }}"
+          
+          if [ ! -f "$VSIX_FILE" ]; then
+            echo "❌ VSIX file not found: $VSIX_FILE"
+            exit 1
+          fi
+          
+          FILE_SIZE=$(stat -f%z "$VSIX_FILE" 2>/dev/null || stat -c%s "$VSIX_FILE")
+          echo "✅ VSIX file exists: $VSIX_FILE ($FILE_SIZE bytes)"
+      
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-package
+          path: ${{ steps.package.outputs.vsix-file }}
+          retention-days: 90
+          if-no-files-found: error
+      
+      - name: Generate package summary
+        if: always()
+        run: |
+          echo "## 📦 Package Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ needs.validate-tag.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "${{ steps.package.outputs.vsix-file }}" ]; then
+            FILE_SIZE=$(stat -f%z "${{ steps.package.outputs.vsix-file }}" 2>/dev/null || stat -c%s "${{ steps.package.outputs.vsix-file }}")
+            FILE_SIZE_MB=$(echo "scale=2; $FILE_SIZE / 1024 / 1024" | bc)
+            
+            echo "**VSIX File:** ${{ steps.package.outputs.vsix-file }}" >> $GITHUB_STEP_SUMMARY
+            echo "**File Size:** ${FILE_SIZE_MB} MB" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ **Status:** Package created successfully" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The VSIX file has been uploaded as an artifact with 90-day retention." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Status:** Package creation failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow Run:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
