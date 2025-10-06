@@ -276,6 +276,45 @@ jobs:
           echo "This typically takes 1-2 minutes..."
           sleep 60
       
+      - name: Verify deployment on marketplace
+        id: verify
+        run: |
+          VERSION="${{ steps.extract-version.outputs.version }}"
+          EXTENSION_ID="pragmatic-rhino.pragmatic-rhino-suit"
+          
+          echo "🔍 Verifying extension is live on marketplace..."
+          
+          # Run verification script
+          if node scripts/verify-deployment.js "$EXTENSION_ID" "$VERSION"; then
+            echo "verify-success=true" >> $GITHUB_OUTPUT
+            echo "✅ Deployment verification passed!"
+          else
+            echo "verify-success=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Deployment verification failed"
+            
+            echo "## ⚠️ Deployment Verification Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Status:** Extension was published but verification failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The extension was successfully published to the marketplace, but the verification" >> $GITHUB_STEP_SUMMARY
+            echo "script could not confirm it is live with the expected version." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Possible Reasons:" >> $GITHUB_STEP_SUMMARY
+            echo "- Marketplace propagation delay (can take 5-10 minutes)" >> $GITHUB_STEP_SUMMARY
+            echo "- Marketplace API temporarily unavailable" >> $GITHUB_STEP_SUMMARY
+            echo "- Network connectivity issues" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Recommended Actions:" >> $GITHUB_STEP_SUMMARY
+            echo "1. Wait 5-10 minutes and manually verify: https://marketplace.visualstudio.com/items?itemName=$EXTENSION_ID" >> $GITHUB_STEP_SUMMARY
+            echo "2. Check marketplace status: https://marketplace.visualstudio.com/" >> $GITHUB_STEP_SUMMARY
+            echo "3. If extension is not visible after 15 minutes, contact marketplace support" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Note:** This is a warning, not a failure. The publish command succeeded." >> $GITHUB_STEP_SUMMARY
+            
+            # Don't fail the workflow, just warn
+            exit 0
+          fi
+      
       - name: Generate deployment summary
         if: always()
         run: |
@@ -286,13 +325,22 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ "${{ steps.publish.outputs.publish-success }}" == "true" ]; then
-            echo "✅ **Status:** Successfully deployed to VS Code Marketplace" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.verify.outputs.verify-success }}" == "true" ]; then
+              echo "✅ **Status:** Successfully deployed and verified on VS Code Marketplace" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "⚠️ **Status:** Deployed to VS Code Marketplace (verification pending)" >> $GITHUB_STEP_SUMMARY
+            fi
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### 📦 Extension Details" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "- **Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
             echo "- **Release:** [${{ github.event.release.name }}](${{ github.event.release.html_url }})" >> $GITHUB_STEP_SUMMARY
             echo "- **Marketplace:** [$MARKETPLACE_URL]($MARKETPLACE_URL)" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.verify.outputs.verify-success }}" == "true" ]; then
+              echo "- **Verification:** ✅ Confirmed live on marketplace" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- **Verification:** ⚠️ Could not confirm (may need manual check)" >> $GITHUB_STEP_SUMMARY
+            fi
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### ⏱️ Deployment Metrics" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -301,9 +349,16 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### 📝 Next Steps" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "1. Verify the extension is live on the marketplace (may take a few minutes)" >> $GITHUB_STEP_SUMMARY
-            echo "2. Test installation: \`code --install-extension pragmatic-rhino.pragmatic-rhino-suit\`" >> $GITHUB_STEP_SUMMARY
-            echo "3. Monitor marketplace metrics and user feedback" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.verify.outputs.verify-success }}" == "true" ]; then
+              echo "1. ✅ Extension is confirmed live on the marketplace" >> $GITHUB_STEP_SUMMARY
+              echo "2. Test installation: \`code --install-extension pragmatic-rhino.pragmatic-rhino-suit\`" >> $GITHUB_STEP_SUMMARY
+              echo "3. Monitor marketplace metrics and user feedback" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "1. ⚠️ Manually verify the extension is live: [$MARKETPLACE_URL]($MARKETPLACE_URL)" >> $GITHUB_STEP_SUMMARY
+              echo "2. Wait 5-10 minutes if not yet visible (marketplace propagation delay)" >> $GITHUB_STEP_SUMMARY
+              echo "3. Test installation: \`code --install-extension pragmatic-rhino.pragmatic-rhino-suit\`" >> $GITHUB_STEP_SUMMARY
+              echo "4. Monitor marketplace metrics and user feedback" >> $GITHUB_STEP_SUMMARY
+            fi
           else
             echo "❌ **Status:** Deployment failed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY

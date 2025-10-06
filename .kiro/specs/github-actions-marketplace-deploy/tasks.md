@@ -237,7 +237,7 @@ This implementation plan breaks down the GitHub Actions CI/CD pipeline into disc
   - Configure marketplace wait/verification
   - _Requirements: 5.6, 5.7_
 
-- [ ] 6.5 Add deployment verification
+- [x] 6.5 Add deployment verification
   - Create `scripts/verify-deployment.js`
   - Check extension is live on marketplace
   - Validate version number
