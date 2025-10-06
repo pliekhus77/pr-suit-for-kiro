@@ -42,6 +42,68 @@ jobs:
         run: npm test -- --coverage --coverageReporters=text --coverageReporters=text-summary --coverageReporters=json-summary --coverageReporters=lcov --coverageReporters=html --coverageReporters=cobertura
         continue-on-error: false
         
+      - name: Run security vulnerability scan
+        id: security
+        run: |
+          echo "### 🔒 Security Vulnerability Scan" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Run npm audit and capture output
+          if npm audit --audit-level=moderate --json > audit-results.json 2>&1; then
+            echo "✅ **No vulnerabilities found**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Critical | 0 |" >> $GITHUB_STEP_SUMMARY
+            echo "| High | 0 |" >> $GITHUB_STEP_SUMMARY
+            echo "| Moderate | 0 |" >> $GITHUB_STEP_SUMMARY
+            echo "| Low | 0 |" >> $GITHUB_STEP_SUMMARY
+          else
+            # Parse audit results
+            CRITICAL=$(jq '.metadata.vulnerabilities.critical // 0' audit-results.json)
+            HIGH=$(jq '.metadata.vulnerabilities.high // 0' audit-results.json)
+            MODERATE=$(jq '.metadata.vulnerabilities.moderate // 0' audit-results.json)
+            LOW=$(jq '.metadata.vulnerabilities.low // 0' audit-results.json)
+            
+            echo "| Severity | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Critical | $CRITICAL |" >> $GITHUB_STEP_SUMMARY
+            echo "| High | $HIGH |" >> $GITHUB_STEP_SUMMARY
+            echo "| Moderate | $MODERATE |" >> $GITHUB_STEP_SUMMARY
+            echo "| Low | $LOW |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            # Check if critical or high severity vulnerabilities exist
+            if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+              echo "❌ **Critical or high severity vulnerabilities detected**" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "**Action Required:** Fix vulnerabilities before merging" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "<details>" >> $GITHUB_STEP_SUMMARY
+              echo "<summary>View vulnerability details</summary>" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              npm audit --audit-level=moderate >> $GITHUB_STEP_SUMMARY || true
+              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+              echo "</details>" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            else
+              echo "⚠️ **Moderate or low severity vulnerabilities found**" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "Consider addressing these vulnerabilities, but they won't block the PR." >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+        continue-on-error: false
+        
+      - name: Upload security scan results
+        if: always() && steps.security.outcome != 'skipped'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-security-scan-${{ github.event.pull_request.number }}
+          path: audit-results.json
+          retention-days: 30
+          if-no-files-found: warn
+        
       - name: Check coverage threshold
         id: coverage
         if: always() && steps.test.outcome == 'success'
@@ -162,6 +224,15 @@ jobs:
             echo "| Unit Tests | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| Unit Tests | ⚠️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Security scan status
+          if [ "${{ steps.security.outcome }}" == "success" ]; then
+            echo "| Security Scan | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.security.outcome }}" == "failure" ]; then
+            echo "| Security Scan | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Security Scan | ⚠️ Skipped |" >> $GITHUB_STEP_SUMMARY
           fi
           
           # Coverage status
