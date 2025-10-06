@@ -283,3 +283,112 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Workflow Run:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** [\`${{ github.event.pull_request.head.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha }})" >> $GITHUB_STEP_SUMMARY
+          
+      - name: Post PR status comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Build the comment body
+            let commentBody = '## 🔍 Pull Request Quality Gates\n\n';
+            commentBody += `**PR #${{ github.event.pull_request.number }}:** ${{ github.event.pull_request.title }}\n`;
+            commentBody += `**Branch:** \`${{ github.head_ref }}\` → \`${{ github.base_ref }}\`\n`;
+            commentBody += `**Author:** @${{ github.event.pull_request.user.login }}\n\n`;
+            commentBody += '---\n\n';
+            commentBody += '### 📊 Quality Check Results\n\n';
+            commentBody += '| Check | Status |\n';
+            commentBody += '|-------|--------|\n';
+            
+            // Compilation status
+            const compileStatus = '${{ steps.compile.outcome }}';
+            commentBody += `| TypeScript Compilation | ${compileStatus === 'success' ? '✅ Passed' : '❌ Failed'} |\n`;
+            
+            // Linting status
+            const lintStatus = '${{ steps.lint.outcome }}';
+            commentBody += `| ESLint | ${lintStatus === 'success' ? '✅ Passed' : '❌ Failed'} |\n`;
+            
+            // Test status
+            const testStatus = '${{ steps.test.outcome }}';
+            if (testStatus === 'success') {
+              commentBody += '| Unit Tests | ✅ Passed |\n';
+            } else if (testStatus === 'failure') {
+              commentBody += '| Unit Tests | ❌ Failed |\n';
+            } else {
+              commentBody += '| Unit Tests | ⚠️ Skipped |\n';
+            }
+            
+            // Security scan status
+            const securityStatus = '${{ steps.security.outcome }}';
+            if (securityStatus === 'success') {
+              commentBody += '| Security Scan | ✅ Passed |\n';
+            } else if (securityStatus === 'failure') {
+              commentBody += '| Security Scan | ❌ Failed |\n';
+            } else {
+              commentBody += '| Security Scan | ⚠️ Skipped |\n';
+            }
+            
+            // Coverage status
+            const coverageStatus = '${{ steps.coverage.outcome }}';
+            if (coverageStatus === 'success') {
+              commentBody += '| Code Coverage (≥80%) | ✅ Passed |\n';
+            } else if (coverageStatus === 'failure') {
+              commentBody += '| Code Coverage (≥80%) | ❌ Failed |\n';
+            } else {
+              commentBody += '| Code Coverage (≥80%) | ⚠️ Skipped |\n';
+            }
+            
+            // Version validation status
+            const versionStatus = '${{ steps.version.outcome }}';
+            if (versionStatus === 'success') {
+              commentBody += '| Version Validation | ✅ Passed |\n';
+            } else if (versionStatus === 'failure') {
+              commentBody += '| Version Validation | ❌ Failed |\n';
+            } else {
+              commentBody += '| Version Validation | ⚠️ Skipped |\n';
+            }
+            
+            commentBody += '\n';
+            
+            // Overall status
+            const jobStatus = '${{ job.status }}';
+            if (jobStatus === 'success') {
+              commentBody += '### ✅ All Quality Gates Passed\n\n';
+              commentBody += 'This pull request meets all quality standards and is ready for review.\n';
+            } else {
+              commentBody += '### ❌ Quality Gates Failed\n\n';
+              commentBody += 'This pull request does not meet quality standards. Please fix the issues above before requesting review.\n\n';
+              commentBody += '**Note:** Merging is blocked until all quality gates pass.\n';
+            }
+            
+            commentBody += '\n---\n\n';
+            commentBody += `**Workflow Run:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n`;
+            commentBody += `**Commit:** [\`${{ github.event.pull_request.head.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.event.pull_request.head.sha }})\n`;
+            
+            // Find existing comment from this workflow
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.data.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('🔍 Pull Request Quality Gates')
+            );
+            
+            // Update existing comment or create new one
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
