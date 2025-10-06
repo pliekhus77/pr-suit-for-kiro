@@ -1,9 +1,6 @@
 # Build artifacts
 artifacts/
 
-# NuGet packages
-*.nupkg
-
 # Test projects
 test-project/
 test-project-meta/

@@ -134,18 +134,6 @@ If you've been manually creating steering documents:
 
 5. **Rename custom documents** to use `custom-` prefix for clarity
 
-### From NuGet Packages
-
-If you've been using the NuGet packages:
-
-1. **Uninstall NuGet packages** (files will remain)
-
-2. **Install the extension**
-
-3. **The extension will detect** existing strategy files
-
-4. **Update metadata** by running "Update All Frameworks"
-
 ---
 
 ## Breaking Changes

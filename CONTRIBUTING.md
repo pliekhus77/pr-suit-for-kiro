@@ -167,15 +167,20 @@ To add a new framework strategy:
    - Update `resources/frameworks/manifest.json`
    - Include id, name, description, category, version, fileName
 
-3. **Create tests**
+3. **Create steering template**
+   - Add corresponding file to `resources/frameworks/`
+   - Name it `strategy-{framework}.md`
+   - Ensure it follows steering document standards
+
+4. **Create tests**
    - Add unit tests for framework loading
    - Add integration tests for installation
 
-4. **Update documentation**
+5. **Update documentation**
    - Add framework to README.md
    - Update CHANGELOG.md
 
-5. **Submit Pull Request**
+6. **Submit Pull Request**
    - Explain why this framework is valuable
    - Provide examples of how it guides Kiro
    - Include any reference documentation

@@ -17,7 +17,7 @@
 
 Pragmatic Rhino SUIT (Standards-Unified Integration Toolkit) is a VS Code extension that provides a curated library of framework-based steering documents to guide Kiro's behavior. Install proven frameworks (TDD/BDD, SABSA Security, C4 Model, Azure, DevOps, etc.) with a single command to ensure your Kiro projects follow best practices from day one.
 
-Think of it as a package manager for Kiro guidance - browse, install, update, and manage framework steering documents that shape how Kiro creates specs, designs architectures, and implements features.
+Think of it as a framework manager for Kiro guidance - browse, install, update, and manage framework steering documents that shape how Kiro creates specs, designs architectures, and implements features.
 
 ## ✨ Features
 
@@ -247,12 +247,18 @@ npm run test:integration
 
 # Watch mode
 npm run test:watch
+
+# Coverage report
+npm test -- --coverage
 ```
 
 ### Package Extension
 
 ```bash
+# Build production bundle
 npm run package
+
+# Create VSIX package
 vsce package
 ```
 

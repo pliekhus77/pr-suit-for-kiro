@@ -6,7 +6,6 @@
 - **TypeScript**: VS Code extension development (primary focus)
 - **JavaScript/Node.js**: Extension runtime and tooling
 - **Markdown**: Documentation, framework references, spec templates
-- **C#**: Future NuGet libraries (Phase 2)
 
 ### Build and Packaging
 - **npm/pnpm**: Package management and dependency resolution
@@ -146,17 +145,17 @@ Each library must include:
 
 ## Dependency Management
 
-### NuGet Package Guidelines
+### npm Package Guidelines
 - Pin major versions, allow minor/patch updates
-- Avoid pre-release packages in production libraries
-- Regular dependency audits for security vulnerabilities
-- Use central package management (Directory.Packages.props)
+- Avoid pre-release packages in production
+- Regular dependency audits for security vulnerabilities (npm audit)
+- Minimize external dependencies
 
 ### Common Dependencies
-- **Microsoft.Extensions.DependencyInjection**: DI abstractions
-- **Microsoft.Extensions.Configuration**: Configuration
-- **Microsoft.Extensions.Logging**: Logging abstractions
-- **System.Text.Json**: JSON serialization (prefer over Newtonsoft.Json)
+- **@types/vscode**: VS Code API type definitions
+- **@types/node**: Node.js type definitions
+- **vscode-test**: Extension testing framework
+- **jest**: Unit testing framework
 
 ## Performance Considerations
 
@@ -205,7 +204,7 @@ Each library must include:
 ### Release Pipeline
 - Automated versioning based on commits
 - Generate release notes automatically
-- Publish to NuGet.org or private feed
+- Publish to VS Code Marketplace
 - Tag releases in source control
 - Deploy documentation to GitHub Pages or similar
 

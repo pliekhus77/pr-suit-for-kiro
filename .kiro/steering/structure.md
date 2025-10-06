@@ -1,7 +1,7 @@
 # Project Structure and Organization
 
 ## Purpose
-Define organizational structure for .NET NuGet libraries following best practices.
+Define organizational structure for VS Code extension development following best practices.
 
 ## Repository Structure
 
@@ -12,27 +12,30 @@ project-root/
 │   ├── steering/               # Project guidance (product, tech, structure, strategies)
 │   └── specs/{feature}/        # Feature specs (requirements, design, tasks, testing-plan)
 ├── frameworks/                 # Reference documentation
-├── src/{Library}/              # Source code
-│   ├── {Feature}/              # Feature folders (Models, Services, Interfaces, etc.)
-│   ├── Configuration/
-│   ├── DependencyInjection/
-│   └── {Library}.csproj
-├── tests/{Library}.Tests/      # Unit & integration tests
-│   ├── {Feature}/Unit/
-│   ├── {Feature}/Integration/
-│   ├── Fixtures/
-│   └── Builders/
-├── tests/{Library}.BDD/        # BDD tests
-│   ├── Features/
-│   ├── StepDefinitions/
-│   └── Support/
+├── src/                        # Extension source code
+│   ├── commands/               # Command implementations
+│   ├── providers/              # Tree views, code lens, diagnostics
+│   ├── services/               # Business logic
+│   ├── models/                 # Data structures
+│   ├── utils/                  # Helpers
+│   ├── webviews/               # UI panels
+│   └── extension.ts            # Entry point
+├── tests/                      # Tests
+│   ├── unit/                   # Jest unit tests
+│   ├── integration/            # VS Code extension tests
+│   └── fixtures/               # Test data
+├── resources/                  # Extension resources
+│   ├── frameworks/             # Framework templates
+│   ├── schemas/                # Validation schemas
+│   └── images/                 # Icons, images
 ├── docs/                       # Documentation
 │   ├── architecture/           # ADRs, C4 diagrams
-│   ├── api/
-│   └── guides/
-├── infrastructure/             # IaC (Pulumi/Bicep)
-├── build/                      # Build scripts and props
-└── .github/workflows/          # CI/CD pipelines
+│   └── guides/                 # User guides
+├── build/                      # Build scripts
+├── .github/workflows/          # CI/CD pipelines
+├── .vscode/                    # VS Code settings
+├── package.json                # Extension manifest
+├── tsconfig.json               # TypeScript config
 ├── README.md
 ├── LICENSE
 └── CHANGELOG.md
@@ -42,71 +45,70 @@ project-root/
 
 **`.kiro/`** - Kiro configuration (settings, steering, specs)  
 **`frameworks/`** - Reference documentation  
-**`src/{Library}/`** - Source code organized by feature  
-**`tests/{Library}.Tests/`** - Unit & integration tests  
-**`tests/{Library}.BDD/`** - BDD tests (Reqnroll + Playwright)  
+**`src/`** - Extension source code (commands, providers, services)  
+**`tests/`** - Unit & integration tests  
+**`resources/`** - Extension resources (frameworks, schemas, images)  
 **`docs/`** - Architecture, API docs, guides  
-**`infrastructure/`** - IaC (Pulumi/Bicep)  
-**`build/`** - Build scripts and shared props
+**`build/`** - Build scripts and packaging
 
 ## Source Code Organization
 
-### Feature Folder Structure
+### Extension Folder Structure
 ```
-{Feature}/
-├── Models/          # Entities, DTOs, value objects
-├── Services/        # Business logic, application services
-├── Interfaces/      # Service contracts, abstractions
-├── Extensions/      # Extension methods
-├── Validators/      # FluentValidation validators
-└── Exceptions/      # Custom exceptions
+src/
+├── commands/        # Command implementations
+├── providers/       # Tree views, code lens, diagnostics
+├── services/        # Business logic
+├── models/          # Data structures, interfaces
+├── utils/           # Helper functions
+├── webviews/        # UI panels (HTML/CSS/JS)
+└── extension.ts     # Activation/deactivation
 ```
 
 ### Test Organization
 ```
-Tests/
-├── Unit/            # Fast, isolated tests ({ClassName}Tests.cs)
-├── Integration/     # Component interaction tests
-├── Fixtures/        # Shared test setup (xUnit fixtures)
-└── Builders/        # Test data builders (fluent API)
-
-BDD/
-├── Features/        # Gherkin scenarios ({Feature}.feature)
-├── StepDefinitions/ # Given/When/Then implementations
-├── Support/         # Hooks, test context
-└── Drivers/         # Page objects (Playwright)
+tests/
+├── unit/            # Fast, isolated tests (Jest)
+│   ├── commands/
+│   ├── services/
+│   └── utils/
+├── integration/     # VS Code extension tests
+│   ├── commands.test.ts
+│   └── providers.test.ts
+└── fixtures/        # Test data and mocks
 
 ## Naming Conventions
 
-**C# Files:** `{ClassName}.cs`, `I{InterfaceName}.cs` (PascalCase)  
-**Tests:** `{ClassName}Tests.cs`, `{Feature}IntegrationTests.cs`  
-**BDD:** `{Feature}.feature`, `{Feature}Steps.cs`  
-**Docs:** `{topic}.md` (kebab-case), ADRs: `{NNNN}-{title}.md`  
-**Projects:** `AgenticReviewer.{LibraryName}.csproj`
+**TypeScript Files:** `kebab-case.ts` (e.g., `framework-manager.ts`)  
+**Classes:** `PascalCase` (e.g., `FrameworkManager`)  
+**Interfaces:** `PascalCase` (e.g., `Framework`, no `I` prefix)  
+**Functions:** `camelCase` (e.g., `installFramework`)  
+**Tests:** `{filename}.test.ts` (e.g., `framework-manager.test.ts`)  
+**Docs:** `{topic}.md` (kebab-case), ADRs: `{NNNN}-{title}.md`
 
-## Namespaces
+## Module Organization
 
-**Pattern:** `AgenticReviewer.{LibraryName}.{Feature}.{Layer}`
+**Pattern:** Organize by feature/responsibility
 
 **Examples:**
-- `AgenticReviewer.Kiro.Configuration.Models`
-- `AgenticReviewer.Kiro.Configuration.Services`
-- `AgenticReviewer.Kiro.Tests.Configuration.Unit`
+- `src/commands/framework-commands.ts`
+- `src/services/framework-manager.ts`
+- `src/providers/framework-tree-provider.ts`
+- `tests/unit/services/framework-manager.test.ts`
 
-**Special:** DependencyInjection, Configuration, Exceptions (no feature folder)
+## Configuration Files
 
-## Project Files
+**package.json:**
+- Extension manifest with metadata
+- Commands, views, configuration contributions
+- Dependencies and scripts
+- Activation events
 
-**Library (.csproj):**
-- TargetFramework: net8.0
-- Nullable: enable
-- GenerateDocumentationFile: true
-- PackageId, Version, Authors, Description, Tags
-
-**Test (.csproj):**
-- IsPackable: false
-- References: xUnit, FluentAssertions, Moq, Microsoft.NET.Test.Sdk
-- ProjectReference to library under test
+**tsconfig.json:**
+- Target: ES2020
+- Module: commonjs
+- Strict mode enabled
+- Source maps for debugging
 
 ## Code Organization
 

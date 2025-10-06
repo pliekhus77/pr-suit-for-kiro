@@ -10,7 +10,7 @@ inclusion: always
 **Tagline:** SUIT Up. Standardize. Ship It.
 
 ## Mission
-Accelerate Amazon Kiro adoption through a VS Code extension that guides developers in applying framework-based best practices and standardized patterns. Future: Complement with .NET NuGet libraries for runtime patterns.
+Accelerate Amazon Kiro adoption through a VS Code extension that guides developers in applying framework-based best practices and standardized patterns.
 
 ## Core Principles
 
@@ -21,7 +21,7 @@ Accelerate Amazon Kiro adoption through a VS Code extension that guides develope
 
 ## Project Scope
 
-**Phase 1: VS Code Extension (Current Focus)**
+**VS Code Extension Features:**
 - Spec scaffolding and management (requirements, design, tasks, testing-plan)
 - Framework guidance and validation (inline suggestions, checks)
 - C4 diagram generation and preview (Mermaid-based)
@@ -29,18 +29,14 @@ Accelerate Amazon Kiro adoption through a VS Code extension that guides develope
 - Hook creation wizards and testing
 - MCP configuration UI and tool testing
 - Workspace structure validation
-
-**Phase 2: NuGet Libraries (Future)**
-- Runtime configuration patterns (IOptions<T> implementations)
-- Framework adapters (DDD building blocks, BDD helpers)
-- Reusable components (authentication, logging, resilience)
-- Testing utilities (builders, fixtures)
+- Framework browsing, installation, and updates
 
 **Out of Scope:**
 - Application-specific business logic
 - One-off solutions without reuse potential
-- IDE support beyond VS Code (Phase 1)
+- IDE support beyond VS Code
 - Direct customer-facing applications
+- Runtime libraries or packages
 
 ## Framework References
 
@@ -124,29 +120,29 @@ When implementing features, consult these frameworks in `frameworks/`:
 
 ## Common Patterns
 
-**Dependency Injection:** Constructor injection, IServiceCollection extensions  
-**Configuration:** IOptions<T> with validation (IValidateOptions<T>)  
-**Logging:** ILogger<T> with structured logging  
-**Error Handling:** Specific exceptions, meaningful messages, preserve stack traces  
-**Async:** Async/await for I/O, ConfigureAwait(false) in library code  
-**Resilience:** Polly for retry/circuit breaker patterns
+**Async Operations:** Use async/await for all I/O operations  
+**Error Handling:** Specific error types, meaningful messages, preserve stack traces  
+**Dependency Injection:** Constructor injection for services  
+**Configuration:** VS Code workspace/user settings  
+**Logging:** VS Code output channels for diagnostics  
+**State Management:** Immutable state, clear ownership
 
 ## Anti-Patterns to Avoid
 
-❌ Hardcoded configuration → ✅ IOptions<T> pattern  
-❌ Static dependencies → ✅ Dependency injection  
-❌ Synchronous I/O → ✅ Async/await  
-❌ Generic exceptions → ✅ Specific exception types  
+❌ Hardcoded paths → ✅ Use workspace API  
+❌ Blocking operations → ✅ Async/await  
+❌ Synchronous I/O → ✅ Async file operations  
+❌ Generic errors → ✅ Specific error types  
 ❌ No tests → ✅ TDD/BDD from start  
 ❌ Tight coupling → ✅ Interface-based abstractions  
-❌ Mutable shared state → ✅ Immutable value objects
+❌ Global state → ✅ Context-based state management
 
 ## Success Metrics
 
-**Adoption:** Number of teams using libraries, NuGet download count  
+**Adoption:** Extension installs, active users, workspace activations  
 **Quality:** Test coverage %, defect rate, security vulnerabilities  
-**Performance:** Build time, test execution time, package size  
-**Satisfaction:** Developer feedback, GitHub issues/PRs, documentation clarity
+**Performance:** Extension activation time, command response time, memory usage  
+**Satisfaction:** User ratings, GitHub issues/PRs, documentation clarity
 
 ## Getting Started
 
