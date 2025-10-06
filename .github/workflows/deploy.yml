@@ -1,0 +1,233 @@
+name: Deploy to Marketplace
+
+# Trigger on GitHub release published
+on:
+  release:
+    types: [published]
+
+# Ensure only one deployment runs at a time
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+# Optional: Configure environment for production deployment
+# Uncomment to enable manual approval requirement
+# environment:
+#   name: production
+#   url: https://marketplace.visualstudio.com/items?itemName=pragmatic-rhino.pragmatic-rhino-suit
+
+jobs:
+  deploy:
+    name: Deploy to VS Code Marketplace
+    runs-on: ubuntu-latest
+    
+    # Set timeout to prevent hanging deployments
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Extract version from release tag
+        id: extract-version
+        run: |
+          TAG_NAME="${{ github.event.release.tag_name }}"
+          VERSION="${TAG_NAME#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📌 Release version: $VERSION"
+          echo "📌 Release tag: $TAG_NAME"
+      
+      - name: Download VSIX artifact
+        id: download
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-package-${{ steps.extract-version.outputs.version }}
+          path: ./artifacts
+        continue-on-error: true
+      
+      - name: Verify artifact download
+        id: verify-artifact
+        run: |
+          VERSION="${{ steps.extract-version.outputs.version }}"
+          VSIX_FILE="./artifacts/pragmatic-rhino-suit-${VERSION}.vsix"
+          
+          if [ ! -f "$VSIX_FILE" ]; then
+            echo "❌ VSIX artifact not found: $VSIX_FILE"
+            echo "artifact-found=false" >> $GITHUB_OUTPUT
+            
+            echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Reason:** VSIX artifact not found" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The VSIX file for version $VERSION was not found in artifacts." >> $GITHUB_STEP_SUMMARY
+            echo "This may indicate that the package workflow did not complete successfully." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Troubleshooting Steps:" >> $GITHUB_STEP_SUMMARY
+            echo "1. Check if the package workflow ran for tag \`v${VERSION}\`" >> $GITHUB_STEP_SUMMARY
+            echo "2. Verify the artifact was uploaded successfully" >> $GITHUB_STEP_SUMMARY
+            echo "3. Ensure the artifact name matches: \`vsix-package-${VERSION}\`" >> $GITHUB_STEP_SUMMARY
+            
+            exit 1
+          fi
+          
+          FILE_SIZE=$(stat -c%s "$VSIX_FILE" 2>/dev/null || stat -f%z "$VSIX_FILE")
+          FILE_SIZE_MB=$(echo "scale=2; $FILE_SIZE / 1024 / 1024" | bc)
+          
+          echo "artifact-found=true" >> $GITHUB_OUTPUT
+          echo "vsix-file=$VSIX_FILE" >> $GITHUB_OUTPUT
+          echo "file-size=$FILE_SIZE" >> $GITHUB_OUTPUT
+          echo "✅ VSIX artifact found: $VSIX_FILE ($FILE_SIZE_MB MB)"
+      
+      - name: Validate file integrity
+        run: |
+          VSIX_FILE="${{ steps.verify-artifact.outputs.vsix-file }}"
+          
+          echo "🔍 Validating VSIX file integrity..."
+          
+          # Check if file is a valid ZIP archive (VSIX is a ZIP file)
+          if ! unzip -t "$VSIX_FILE" > /dev/null 2>&1; then
+            echo "❌ VSIX file is corrupted or not a valid ZIP archive"
+            exit 1
+          fi
+          
+          echo "✅ VSIX file integrity check passed"
+      
+      - name: Authenticate with VS Code Marketplace
+        id: auth
+        run: |
+          if [ -z "${{ secrets.VSCE_PAT }}" ]; then
+            echo "❌ VSCE_PAT secret is not configured"
+            echo "auth-success=false" >> $GITHUB_OUTPUT
+            
+            echo "## ❌ Authentication Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Reason:** VSCE_PAT secret is not configured" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Setup Instructions:" >> $GITHUB_STEP_SUMMARY
+            echo "1. Create a Personal Access Token (PAT) in Azure DevOps" >> $GITHUB_STEP_SUMMARY
+            echo "2. Grant the token 'Marketplace (Publish)' scope" >> $GITHUB_STEP_SUMMARY
+            echo "3. Add the token as a GitHub secret named \`VSCE_PAT\`" >> $GITHUB_STEP_SUMMARY
+            echo "4. See [docs/deployment/SECRETS.md](../docs/deployment/SECRETS.md) for detailed instructions" >> $GITHUB_STEP_SUMMARY
+            
+            exit 1
+          fi
+          
+          echo "auth-success=true" >> $GITHUB_OUTPUT
+          echo "✅ VSCE_PAT secret is configured"
+        env:
+          # Ensure secret is masked in logs
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      
+      - name: Install vsce
+        run: |
+          echo "📦 Installing vsce (Visual Studio Code Extension Manager)..."
+          npm install -g @vscode/vsce
+          vsce --version
+      
+      - name: Publish to VS Code Marketplace
+        id: publish
+        run: |
+          VSIX_FILE="${{ steps.verify-artifact.outputs.vsix-file }}"
+          VERSION="${{ steps.extract-version.outputs.version }}"
+          
+          echo "🚀 Publishing extension to VS Code Marketplace..."
+          echo "📦 VSIX File: $VSIX_FILE"
+          echo "📌 Version: $VERSION"
+          
+          # Publish with retry logic
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          RETRY_DELAY=10
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if vsce publish --packagePath "$VSIX_FILE" --pat "${{ secrets.VSCE_PAT }}"; then
+              echo "publish-success=true" >> $GITHUB_OUTPUT
+              echo "✅ Extension published successfully!"
+              break
+            else
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "⚠️ Publish attempt $RETRY_COUNT failed. Retrying in ${RETRY_DELAY}s..."
+                sleep $RETRY_DELAY
+                RETRY_DELAY=$((RETRY_DELAY * 2))  # Exponential backoff
+              else
+                echo "publish-success=false" >> $GITHUB_OUTPUT
+                echo "❌ Failed to publish after $MAX_RETRIES attempts"
+                
+                echo "## ❌ Marketplace Publishing Failed" >> $GITHUB_STEP_SUMMARY
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo "**Reason:** Marketplace rejected the package after $MAX_RETRIES attempts" >> $GITHUB_STEP_SUMMARY
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo "### Possible Causes:" >> $GITHUB_STEP_SUMMARY
+                echo "- Invalid or expired VSCE_PAT token" >> $GITHUB_STEP_SUMMARY
+                echo "- Version already exists on marketplace" >> $GITHUB_STEP_SUMMARY
+                echo "- Package validation failed" >> $GITHUB_STEP_SUMMARY
+                echo "- Marketplace service unavailable" >> $GITHUB_STEP_SUMMARY
+                echo "" >> $GITHUB_STEP_SUMMARY
+                echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+                echo "1. Check the error message above for specific details" >> $GITHUB_STEP_SUMMARY
+                echo "2. Verify VSCE_PAT token is valid and has correct permissions" >> $GITHUB_STEP_SUMMARY
+                echo "3. Check marketplace status: https://marketplace.visualstudio.com/" >> $GITHUB_STEP_SUMMARY
+                echo "4. Consider using the rollback workflow if needed" >> $GITHUB_STEP_SUMMARY
+                
+                exit 1
+              fi
+            fi
+          done
+        env:
+          # Ensure PAT is masked in logs
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      
+      - name: Wait for marketplace processing
+        run: |
+          echo "⏳ Waiting for marketplace to process the extension..."
+          echo "This typically takes 1-2 minutes..."
+          sleep 60
+      
+      - name: Generate deployment summary
+        if: always()
+        run: |
+          VERSION="${{ steps.extract-version.outputs.version }}"
+          MARKETPLACE_URL="https://marketplace.visualstudio.com/items?itemName=pragmatic-rhino.pragmatic-rhino-suit"
+          
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.publish.outputs.publish-success }}" == "true" ]; then
+            echo "✅ **Status:** Successfully deployed to VS Code Marketplace" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📦 Extension Details" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+            echo "- **Release:** [${{ github.event.release.name }}](${{ github.event.release.html_url }})" >> $GITHUB_STEP_SUMMARY
+            echo "- **Marketplace:** [$MARKETPLACE_URL]($MARKETPLACE_URL)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### ⏱️ Deployment Metrics" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Workflow Duration:** ${{ job.status == 'success' && 'Completed' || 'Failed' }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **VSIX Size:** $(echo "scale=2; ${{ steps.verify-artifact.outputs.file-size }} / 1024 / 1024" | bc) MB" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📝 Next Steps" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "1. Verify the extension is live on the marketplace (may take a few minutes)" >> $GITHUB_STEP_SUMMARY
+            echo "2. Test installation: \`code --install-extension pragmatic-rhino.pragmatic-rhino-suit\`" >> $GITHUB_STEP_SUMMARY
+            echo "3. Monitor marketplace metrics and user feedback" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status:** Deployment failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "See error details above for troubleshooting steps." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow Run:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Release:** [${{ github.event.release.tag_name }}](${{ github.event.release.html_url }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY
+

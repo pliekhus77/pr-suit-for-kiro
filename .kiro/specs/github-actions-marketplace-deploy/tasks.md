@@ -213,7 +213,7 @@ This implementation plan breaks down the GitHub Actions CI/CD pipeline into disc
 
 ## 6. Marketplace Deployment
 
-- [ ] 6.1 Create deploy workflow
+- [x] 6.1 Create deploy workflow
   - Create `.github/workflows/deploy.yml`
   - Configure trigger on release published
   - Add environment configuration
