@@ -279,7 +279,7 @@ This implementation plan breaks down the GitHub Actions CI/CD pipeline into disc
   - Handle missing artifact scenario
   - _Requirements: 7.4_
 
-- [ ] 7.3 Add rollback publishing
+- [x] 7.3 Add rollback publishing
   - Republish selected version to marketplace
   - Verify rollback success
   - _Requirements: 7.5_
