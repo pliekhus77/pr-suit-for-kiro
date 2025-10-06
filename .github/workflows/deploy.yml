@@ -11,7 +11,12 @@ concurrency:
   cancel-in-progress: false
 
 # Optional: Configure environment for production deployment
-# Uncomment to enable manual approval requirement
+# To enable manual approval:
+# 1. Create 'production' environment in Settings → Environments
+# 2. Configure required reviewers for manual approval
+# 3. Uncomment the lines below
+# 4. See docs/deployment/PRODUCTION_ENVIRONMENT.md for details
+#
 # environment:
 #   name: production
 #   url: https://marketplace.visualstudio.com/items?itemName=pragmatic-rhino.pragmatic-rhino-suit
