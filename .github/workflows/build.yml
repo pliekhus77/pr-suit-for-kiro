@@ -45,9 +45,9 @@ jobs:
             echo "Please fix linting errors before proceeding" >> $GITHUB_STEP_SUMMARY
           fi
           
-      - name: Run tests
+      - name: Run tests with coverage
         id: test
-        run: npm test
+        run: npm test -- --coverage --coverageReporters=text --coverageReporters=text-summary --coverageReporters=json-summary --coverageReporters=lcov --coverageReporters=html --coverageReporters=cobertura
         continue-on-error: false
         
       - name: Generate test summary
@@ -59,4 +59,84 @@ jobs:
           else
             echo "❌ Tests failed - build failed" >> $GITHUB_STEP_SUMMARY
             echo "Please fix failing tests before proceeding" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+      - name: Check coverage threshold
+        id: coverage
+        if: always() && steps.test.outcome == 'success'
+        run: |
+          # Extract coverage percentages from coverage-summary.json
+          if [ -f "coverage/coverage-summary.json" ]; then
+            LINES=$(jq '.total.lines.pct' coverage/coverage-summary.json)
+            STATEMENTS=$(jq '.total.statements.pct' coverage/coverage-summary.json)
+            FUNCTIONS=$(jq '.total.functions.pct' coverage/coverage-summary.json)
+            BRANCHES=$(jq '.total.branches.pct' coverage/coverage-summary.json)
+            
+            echo "### Code Coverage" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Coverage | Status |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|----------|--------|" >> $GITHUB_STEP_SUMMARY
+            
+            # Check each metric against 80% threshold
+            THRESHOLD=80
+            FAILED=0
+            
+            if (( $(echo "$LINES >= $THRESHOLD" | bc -l) )); then
+              echo "| Lines | ${LINES}% | ✅ |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Lines | ${LINES}% | ❌ |" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+            
+            if (( $(echo "$STATEMENTS >= $THRESHOLD" | bc -l) )); then
+              echo "| Statements | ${STATEMENTS}% | ✅ |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Statements | ${STATEMENTS}% | ❌ |" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+            
+            if (( $(echo "$FUNCTIONS >= $THRESHOLD" | bc -l) )); then
+              echo "| Functions | ${FUNCTIONS}% | ✅ |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Functions | ${FUNCTIONS}% | ❌ |" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+            
+            if (( $(echo "$BRANCHES >= $THRESHOLD" | bc -l) )); then
+              echo "| Branches | ${BRANCHES}% | ✅ |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Branches | ${BRANCHES}% | ❌ |" >> $GITHUB_STEP_SUMMARY
+              FAILED=1
+            fi
+            
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            if [ $FAILED -eq 1 ]; then
+              echo "❌ **Coverage threshold not met** - Minimum 80% required for all metrics" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            else
+              echo "✅ **All coverage thresholds met** - Minimum 80% achieved" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "❌ Coverage report not found" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          
+      - name: Upload coverage reports
+        if: always() && steps.test.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            coverage/
+            !coverage/**/*.js
+          retention-days: 30
+          
+      - name: Generate coverage summary
+        if: always()
+        run: |
+          if [ "${{ steps.coverage.outcome }}" == "success" ]; then
+            echo "✅ Code coverage validation passed" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.coverage.outcome }}" == "failure" ]; then
+            echo "❌ Code coverage below 80% threshold" >> $GITHUB_STEP_SUMMARY
           fi
