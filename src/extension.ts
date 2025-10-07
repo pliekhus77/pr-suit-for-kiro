@@ -4,7 +4,7 @@ import { SteeringValidator } from './services/steering-validator';
 import { FrameworkReferenceManager } from './services/framework-reference-manager';
 import { browseFrameworksCommand, updateFrameworkCommand, updateAllFrameworksCommand } from './commands/framework-commands';
 import { createCustomSteeringCommand, renameCustomSteeringCommand, deleteCustomSteeringCommand, exportCustomSteeringCommand, validateSteeringCommand } from './commands/steering-commands';
-import { initializeWorkspaceCommand, searchFrameworksCommand, viewFrameworkReferenceCommand } from './commands/workspace-commands';
+import { searchFrameworksCommand, viewFrameworkReferenceCommand } from './commands/workspace-commands';
 import { SteeringTreeProvider } from './providers/steering-tree-provider';
 import { FrameworkReferenceCodeLensProvider } from './providers/framework-reference-codelens';
 import { FrameworkHoverProvider } from './providers/framework-hover-provider';
@@ -14,7 +14,7 @@ import { SteeringItem } from './models/steering';
 
 /**
  * Extension activation function
- * Called when the extension is activated (workspace contains .kiro/ or initializeWorkspace command is executed)
+ * Called when the extension is activated (workspace contains .kiro/)
  */
 export function activate(context: vscode.ExtensionContext): { context: vscode.ExtensionContext } {
   const activationStart = Date.now();
@@ -86,7 +86,7 @@ function registerCommands(
   const browseFrameworks = vscode.commands.registerCommand(
     'agentic-reviewer.browseFrameworks',
     async () => {
-      await browseFrameworksCommand(context, frameworkManager);
+      await browseFrameworksCommand(context, frameworkManager, referenceManager);
     }
   );
 
@@ -161,13 +161,6 @@ function registerCommands(
   );
 
   // Workspace commands
-  const initializeWorkspace = vscode.commands.registerCommand(
-    'agentic-reviewer.initializeWorkspace',
-    async () => {
-      await initializeWorkspaceCommand(context, fileSystem, frameworkManager);
-    }
-  );
-
   const searchFrameworks = vscode.commands.registerCommand(
     'agentic-reviewer.searchFrameworks',
     async () => {
@@ -234,7 +227,6 @@ function registerCommands(
     renameCustomSteering,
     deleteCustomSteering,
     exportCustomSteering,
-    initializeWorkspace,
     searchFrameworks,
     viewFrameworkReference,
     initializeFrameworksDirectory,

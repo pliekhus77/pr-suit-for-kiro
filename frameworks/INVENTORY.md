@@ -138,7 +138,7 @@
 - **Octopus Deploy** - Deployment automation
 
 ### Monitoring & Observability
-- **Application Insights** - Microsoft application monitoring
+- **APM Strategy** - Application Performance Monitoring comprehensive guide- **Application Insights** - Microsoft application monitoring
 - **Prometheus** - Metrics collection and alerting
 - **Grafana** - Metrics visualization and dashboards
 - **Jaeger** - Distributed tracing system

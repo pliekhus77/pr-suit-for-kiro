@@ -5,9 +5,11 @@ import { FrameworkReferenceManager, SearchResult } from '../services/framework-r
 
 /**
  * Initialize Workspace Command
+ * DEPRECATED: Removed from extension - kept for reference only
  * Creates .kiro/ directory structure and optionally installs recommended frameworks
  */
-export async function initializeWorkspaceCommand(
+/* istanbul ignore next */
+async function initializeWorkspaceCommand_DEPRECATED(
   context: vscode.ExtensionContext,
   fileSystem: FileSystemOperations,
   frameworkManager: FrameworkManager

@@ -37,6 +37,7 @@ export class FileSystemOperations {
 
   /**
    * List files in a directory, optionally filtered by pattern
+   * Pattern can be a glob pattern (e.g., '*.md') or a regex pattern
    */
   async listFiles(directory: string, pattern?: string): Promise<string[]> {
     try {
@@ -46,7 +47,19 @@ export class FileSystemOperations {
         .map(entry => entry.name);
 
       if (pattern) {
-        const regex = new RegExp(pattern);
+        // Convert glob pattern to regex if it looks like a glob
+        let regex: RegExp;
+        if (pattern.includes('*') || pattern.includes('?')) {
+          // Convert glob to regex: * -> .*, ? -> ., escape other special chars
+          const regexPattern = pattern
+            .replace(/[.+^${}()|[\]\\]/g, '\\$&') // Escape regex special chars
+            .replace(/\*/g, '.*')                  // * -> .*
+            .replace(/\?/g, '.');                  // ? -> .
+          regex = new RegExp(`^${regexPattern}$`);
+        } else {
+          // Use as-is regex pattern
+          regex = new RegExp(pattern);
+        }
         files = files.filter(file => regex.test(file));
       }
 

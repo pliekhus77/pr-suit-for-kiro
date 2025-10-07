@@ -13,7 +13,7 @@
     {
       "id": "security-strategy",
       "name": "SABSA Security Strategy",
-      "description": "Security architecture and threat modeling practices",
+      "description": "Security architecture, threat modeling (STRIDE), and compliance (GDPR, HIPAA, SOC2)",
       "category": "security",
       "version": "1.0.0",
       "fileName": "strategy-security.md",
@@ -22,16 +22,25 @@
     {
       "id": "c4-model-strategy",
       "name": "C4 Model Architecture",
-      "description": "When and how to use C4 diagrams in specs",
+      "description": "When and how to use C4 diagrams in specs (System Context, Container, Component, Dynamic)",
       "category": "architecture",
       "version": "1.0.0",
       "fileName": "strategy-c4-model.md",
       "dependencies": []
     },
     {
+      "id": "aws-strategy",
+      "name": "AWS Hosting Strategy",
+      "description": "AWS service selection, Well-Architected Framework (6 pillars), and hosting patterns",
+      "category": "cloud",
+      "version": "1.0.0",
+      "fileName": "strategy-aws.md",
+      "dependencies": []
+    },
+    {
       "id": "azure-strategy",
       "name": "Azure Hosting Strategy",
-      "description": "Azure service selection and hosting patterns",
+      "description": "Azure service selection, Well-Architected principles, and hosting patterns",
       "category": "cloud",
       "version": "1.0.0",
       "fileName": "strategy-azure.md",
@@ -40,25 +49,52 @@
     {
       "id": "devops-strategy",
       "name": "DevOps CI/CD Strategy",
-      "description": "Continuous integration and deployment practices",
+      "description": "Continuous integration/deployment, DORA metrics, and deployment strategies",
       "category": "devops",
       "version": "1.0.0",
       "fileName": "strategy-devops.md",
       "dependencies": []
     },
     {
+      "id": "apm-strategy",
+      "name": "APM Strategy",
+      "description": "Application Performance Monitoring with metrics, logs, traces, alerting, and cost optimization",
+      "category": "monitoring",
+      "version": "1.0.0",
+      "fileName": "strategy-apm.md",
+      "dependencies": []
+    },
+    {
       "id": "iac-strategy",
       "name": "Infrastructure as Code (Pulumi)",
-      "description": "IaC patterns and best practices with Pulumi",
+      "description": "IaC patterns and best practices with Pulumi (real programming languages)",
       "category": "infrastructure",
       "version": "1.0.0",
       "fileName": "strategy-iac.md",
       "dependencies": []
     },
     {
+      "id": "ddd-strategy",
+      "name": "Domain-Driven Design (DDD)",
+      "description": "Strategic and tactical DDD patterns for complex business domains",
+      "category": "architecture",
+      "version": "1.0.0",
+      "fileName": "strategy-ddd.md",
+      "dependencies": []
+    },
+    {
+      "id": "dotnet-strategy",
+      "name": ".NET Best Practices",
+      "description": ".NET 8.0 development standards for performance, security, and maintainability",
+      "category": "development",
+      "version": "1.0.0",
+      "fileName": "strategy-dotnet.md",
+      "dependencies": []
+    },
+    {
       "id": "4d-safe-strategy",
       "name": "4D SDLC + SAFe Work Management",
-      "description": "Work management combining 4D phases with SAFe practices",
+      "description": "Define-Design-Develop-Deploy phases with SAFe practices and WSJF prioritization",
       "category": "work-management",
       "version": "1.0.0",
       "fileName": "strategy-4d-safe.md",
@@ -67,7 +103,7 @@
     {
       "id": "ea-strategy",
       "name": "Enterprise Architecture (TOGAF/Zachman)",
-      "description": "EA questions for product planning and feature design",
+      "description": "Strategic planning questions for product and feature design",
       "category": "architecture",
       "version": "1.0.0",
       "fileName": "strategy-ea.md",

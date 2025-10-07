@@ -57,6 +57,7 @@ Create team-specific steering documents with templates and validation support.
 | **AWS Hosting Strategy** | Cloud | AWS service selection, Well-Architected Framework (6 pillars), and hosting patterns |
 | **Azure Hosting Strategy** | Cloud | Azure service selection, Well-Architected principles, and hosting patterns |
 | **DevOps CI/CD Strategy** | DevOps | Continuous integration/deployment, DORA metrics, and deployment strategies |
+| **APM Strategy** | Monitoring | Application Performance Monitoring with metrics, logs, traces, alerting, and cost optimization |
 | **Infrastructure as Code (Pulumi)** | Infrastructure | IaC patterns and best practices with Pulumi (real programming languages) |
 | **Domain-Driven Design (DDD)** | Architecture | Strategic and tactical DDD patterns for complex business domains |
 | **.NET Best Practices** | Development | .NET 8.0 development standards for performance, security, and maintainability |

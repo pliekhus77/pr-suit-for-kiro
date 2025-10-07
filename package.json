@@ -89,12 +89,6 @@
         "category": "Pragmatic Rhino SUIT"
       },
       {
-        "command": "agentic-reviewer.initializeWorkspace",
-        "title": "Initialize Workspace",
-        "category": "Pragmatic Rhino SUIT",
-        "icon": "$(folder-opened)"
-      },
-      {
         "command": "agentic-reviewer.searchFrameworks",
         "title": "Search Frameworks",
         "category": "Pragmatic Rhino SUIT",
@@ -139,7 +133,7 @@
     "viewsWelcome": [
       {
         "view": "pragmaticRhinoSuit.steeringTree",
-        "contents": "No framework steering documents found.\n[Browse Frameworks](command:agentic-reviewer.browseFrameworks)\n[Initialize Workspace](command:agentic-reviewer.initializeWorkspace)"
+        "contents": "No framework steering documents found.\n[Browse Frameworks](command:agentic-reviewer.browseFrameworks)"
       }
     ],
     "menus": {

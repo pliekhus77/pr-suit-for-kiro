@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { FrameworkManager } from '../services/framework-manager';
+import { FrameworkReferenceManager } from '../services/framework-reference-manager';
 import { Framework, FrameworkCategory } from '../models/framework';
 
 /**
@@ -33,7 +34,8 @@ const CATEGORY_LABELS: Record<FrameworkCategory, string> = {
  */
 export async function browseFrameworksCommand(
   context: vscode.ExtensionContext,
-  frameworkManager: FrameworkManager
+  frameworkManager: FrameworkManager,
+  referenceManager?: FrameworkReferenceManager
 ): Promise<void> {
   try {
     // Get all available frameworks
@@ -54,8 +56,8 @@ export async function browseFrameworksCommand(
     });
 
     if (selected) {
-      // Show framework preview (will be implemented in task 5.2)
-      await showFrameworkPreview(context, frameworkManager, selected);
+      // Show framework preview
+      await showFrameworkPreview(context, frameworkManager, selected, referenceManager);
     }
   } catch (error) {
     vscode.window.showErrorMessage(
@@ -126,7 +128,8 @@ async function createFrameworkQuickPickItems(
 async function showFrameworkPreview(
   context: vscode.ExtensionContext,
   frameworkManager: FrameworkManager,
-  item: FrameworkQuickPickItem
+  item: FrameworkQuickPickItem,
+  referenceManager?: FrameworkReferenceManager
 ): Promise<void> {
   const framework = item.framework;
   
@@ -136,11 +139,13 @@ async function showFrameworkPreview(
   // Define action buttons
   const actions: string[] = [];
   
-  if (!item.installed) {
+  if (item.installed) {
+    actions.push('Uninstall');
+  } else {
     actions.push('Install');
   }
   
-  actions.push('View Full Documentation', 'Cancel');
+  actions.push('View Full Documentation');
   
   // Show preview with action buttons
   const selection = await vscode.window.showInformationMessage(
@@ -152,10 +157,12 @@ async function showFrameworkPreview(
   // Handle user selection
   if (selection === 'Install') {
     await handleInstallAction(frameworkManager, framework);
+  } else if (selection === 'Uninstall') {
+    await handleUninstallAction(frameworkManager, framework);
   } else if (selection === 'View Full Documentation') {
-    await handleViewDocumentationAction(context, framework);
+    await handleViewDocumentationAction(context, framework, referenceManager);
   }
-  // Cancel or no selection - do nothing
+  // No selection (user dismissed) - do nothing
 }
 
 /**
@@ -203,11 +210,53 @@ async function handleInstallAction(
 }
 
 /**
+ * Handle Uninstall action
+ */
+async function handleUninstallAction(
+  frameworkManager: FrameworkManager,
+  framework: Framework
+): Promise<void> {
+  try {
+    // Confirm uninstall
+    const confirmation = await vscode.window.showWarningMessage(
+      `Are you sure you want to uninstall "${framework.name}"? This will remove the file from your .kiro/steering/ directory.`,
+      { modal: true },
+      'Uninstall'
+    );
+    
+    if (confirmation !== 'Uninstall') {
+      return;
+    }
+    
+    // Perform uninstall with progress
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: `Uninstalling ${framework.name}...`,
+        cancellable: false
+      },
+      async () => {
+        await frameworkManager.removeFramework(framework.id);
+      }
+    );
+    
+    vscode.window.showInformationMessage(
+      `Framework uninstalled: ${framework.name}`
+    );
+  } catch (error) {
+    vscode.window.showErrorMessage(
+      `Failed to uninstall framework: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+}
+
+/**
  * Handle View Full Documentation action
  */
 async function handleViewDocumentationAction(
   context: vscode.ExtensionContext,
-  framework: Framework
+  framework: Framework,
+  referenceManager?: FrameworkReferenceManager
 ): Promise<void> {
   try {
     // Check if frameworks/ directory exists in workspace
@@ -232,15 +281,38 @@ async function handleViewDocumentationAction(
     } catch {
       // If reference doesn't exist, offer to initialize frameworks directory
       const choice = await vscode.window.showInformationMessage(
-        `Framework reference documentation not found. Would you like to initialize the frameworks/ directory?`,
+        `Framework reference documentation not found. Would you like to initialize the frameworks/ directory with all reference documents?`,
         'Initialize',
         'Cancel'
       );
       
       if (choice === 'Initialize') {
-        vscode.window.showInformationMessage(
-          'Framework directory initialization will be available in a future task.'
+        if (!referenceManager) {
+          vscode.window.showErrorMessage('Reference manager not available');
+          return;
+        }
+        
+        // Initialize frameworks directory with progress
+        await vscode.window.withProgress(
+          {
+            location: vscode.ProgressLocation.Notification,
+            title: 'Initializing frameworks directory...',
+            cancellable: false
+          },
+          async () => {
+            await referenceManager.initializeFrameworksDirectory();
+          }
         );
+        
+        // Try to open the document again after initialization
+        try {
+          const doc = await vscode.workspace.openTextDocument(referencePath);
+          await vscode.window.showTextDocument(doc);
+        } catch (error) {
+          vscode.window.showErrorMessage(
+            `Failed to open documentation after initialization: ${error instanceof Error ? error.message : String(error)}`
+          );
+        }
       }
     }
   } catch (error) {
