@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { FileSystemOperations } from '../../utils/file-system';
 import { FrameworkManager } from '../../services/framework-manager';
-import { initializeWorkspaceCommand } from '../../commands/workspace-commands';
+// import { initializeWorkspaceCommand } from '../../commands/workspace-commands';
 
 suite('Workspace Initialization Integration Tests', () => {
   let workspaceRoot: string;

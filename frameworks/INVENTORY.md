@@ -111,6 +111,7 @@
 - **PostgreSQL** - Open-source relational database
 - **MySQL** - Popular relational database
 - **SQL Server** - Microsoft relational database
+- **SQL Server Stored Procedures** - Best practices and patterns for stored procedure development
 - **MongoDB** - Document-oriented NoSQL database
 - **Redis** - In-memory data structure store
 - **Elasticsearch** - Search and analytics engine

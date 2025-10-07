@@ -2,7 +2,7 @@
   "name": "pragmatic-rhino-suit",
   "displayName": "Pragmatic Rhino SUIT",
   "description": "Standards-Unified Integration Toolkit - SUIT Up. Standardize. Ship It.",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "publisher": "pragmatic-rhino",
   "author": "Patrick Liekhus",
   "license": "MIT",
@@ -139,9 +139,24 @@
     "menus": {
       "view/title": [
         {
+          "command": "agentic-reviewer.browseFrameworks",
+          "when": "view == pragmaticRhinoSuit.steeringTree",
+          "group": "navigation@1"
+        },
+        {
+          "command": "agentic-reviewer.installFramework",
+          "when": "view == pragmaticRhinoSuit.steeringTree",
+          "group": "navigation@2"
+        },
+        {
+          "command": "agentic-reviewer.createCustomSteering",
+          "when": "view == pragmaticRhinoSuit.steeringTree",
+          "group": "navigation@3"
+        },
+        {
           "command": "agentic-reviewer.refreshSteeringTree",
           "when": "view == pragmaticRhinoSuit.steeringTree",
-          "group": "navigation"
+          "group": "navigation@4"
         }
       ],
       "view/item/context": [
@@ -236,7 +251,15 @@
     "test:bdd:watch": "nodemon --watch tests/bdd --ext feature,ts --exec npm run test:bdd",
     "playwright:install": "playwright install",
     "package:vsix": "vsce package",
-    "publish": "vsce publish"
+    "publish": "vsce publish",
+    "test:workflows": "node scripts/run-all-workflow-tests.js",
+    "test:workflow:build": "node scripts/run-all-workflow-tests.js --suite=build",
+    "test:workflow:pr": "node scripts/run-all-workflow-tests.js --suite=pr",
+    "test:workflow:version": "node scripts/run-all-workflow-tests.js --suite=version",
+    "test:workflow:package": "node scripts/run-all-workflow-tests.js --suite=package",
+    "test:workflow:deploy": "node scripts/run-all-workflow-tests.js --suite=deploy",
+    "test:workflow:rollback": "node scripts/run-all-workflow-tests.js --suite=rollback",
+    "test:workflow:security": "node scripts/run-all-workflow-tests.js --suite=security"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^12.2.0",

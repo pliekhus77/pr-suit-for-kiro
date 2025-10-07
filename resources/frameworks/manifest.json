@@ -117,6 +117,15 @@
       "version": "1.0.0",
       "fileName": "strategy-ea.md",
       "dependencies": []
+    },
+    {
+      "id": "sql-server-sp-strategy",
+      "name": "SQL Server Stored Procedures Strategy",
+      "description": "Best practices for designing, implementing, and maintaining SQL Server stored procedures with security and performance guidance",
+      "category": "database",
+      "version": "1.0.0",
+      "fileName": "strategy-sql-server-sp.md",
+      "dependencies": []
     }
   ]
 }
