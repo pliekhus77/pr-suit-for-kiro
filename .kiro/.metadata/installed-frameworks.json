@@ -5,6 +5,18 @@
       "version": "1.0.0",
       "installedAt": "2025-10-07T09:36:27.591Z",
       "customized": false
+    },
+    {
+      "id": "tdd-bdd-strategy",
+      "version": "1.0.0",
+      "installedAt": "2025-10-07T09:39:42.766Z",
+      "customized": false
+    },
+    {
+      "id": "4d-safe-strategy",
+      "version": "1.0.0",
+      "installedAt": "2025-10-07T09:39:57.712Z",
+      "customized": false
     }
   ]
 }

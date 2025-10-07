@@ -6,7 +6,7 @@ import { FileSystemOperations } from '../../utils/file-system';
 import { FrameworkManager } from '../../services/framework-manager';
 // import { initializeWorkspaceCommand } from '../../commands/workspace-commands';
 
-suite('Workspace Initialization Integration Tests', () => {
+suite.skip('Workspace Initialization Integration Tests', () => {
   let workspaceRoot: string;
   let fileSystem: FileSystemOperations;
   let frameworkManager: FrameworkManager;

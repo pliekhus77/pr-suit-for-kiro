@@ -126,6 +126,15 @@
       "version": "1.0.0",
       "fileName": "strategy-sql-server-sp.md",
       "dependencies": []
+    },
+    {
+      "id": "entity-framework-strategy",
+      "name": "Entity Framework Strategy",
+      "description": "Microsoft's ORM for .NET applications with code-first development, migrations, and performance optimization",
+      "category": "database",
+      "version": "1.0.0",
+      "fileName": "strategy-entity-framework.md",
+      "dependencies": ["ddd-strategy", "dotnet-strategy"]
     }
   ]
 }

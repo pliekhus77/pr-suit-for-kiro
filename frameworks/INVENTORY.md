@@ -115,6 +115,7 @@
 - **MongoDB** - Document-oriented NoSQL database
 - **Redis** - In-memory data structure store
 - **Elasticsearch** - Search and analytics engine
+- **Entity Framework** - Microsoft's ORM for .NET applications
 - **Apache Cassandra** - Distributed NoSQL database
 - **Neo4j** - Graph database
 - **InfluxDB** - Time-series database
