@@ -1,334 +1,136 @@
+---
+inclusion: always
+category: Development Strategy
+framework: .NET Best Practices
+description: Modern .NET 8.0+ development patterns for performance, security, maintainability, and cloud-native deployment
+tags: [dotnet, csharp, performance, security, cloud-native, minimal-apis]
+---
+
 # .NET Best Practices Strategy
 
 ## Purpose
 Guide development teams in applying modern .NET 8.0+ development patterns for performance, security, maintainability, and cloud-native deployment.
 
-## Key Concepts
+## Core Principles
 
-### Modern .NET Principles
-- **Performance First** - Optimize for throughput and memory efficiency
-- **Cloud Native** - Design for containers, microservices, and serverless
-- **Minimal APIs** - Reduce ceremony, focus on business logic
-- **Source Generators** - Compile-time code generation over runtime reflection
-- **Nullable Reference Types** - Compile-time null safety
+### Modern .NET Features
+- **Performance First**: Optimize for throughput and memory efficiency
+- **Cloud Native**: Design for containers, microservices, and serverless
+- **Minimal APIs**: Reduce ceremony, focus on business logic
+- **Source Generators**: Compile-time code generation over runtime reflection
+- **Nullable Reference Types**: Compile-time null safety
 
-### Platform Features
-- **Span<T> and Memory<T>** - High-performance memory operations
-- **System.Text.Json** - Fast, low-allocation JSON serialization
-- **Native AOT** - Ahead-of-time compilation for faster startup
-- **Minimal APIs** - Lightweight HTTP APIs with less overhead
-- **Record Types** - Immutable data structures with value semantics
+### Platform Advantages
+| Feature | Benefit | Use Case |
+|---------|---------|----------|
+| **Span<T>/Memory<T>** | Zero-allocation operations | High-performance data processing |
+| **System.Text.Json** | Fast JSON serialization | API responses, configuration |
+| **Native AOT** | Faster startup, smaller footprint | Serverless functions, containers |
+| **Record Types** | Immutable data structures | DTOs, value objects |
+| **Minimal APIs** | Lightweight HTTP endpoints | Microservices, simple APIs |
 
-## Best Practices
+## API Development Best Practices
 
-### API Development
+### Minimal API Pattern
 ```csharp
-// Minimal API with proper patterns
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure services
+// Service configuration
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddDbContext<OrderContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 var app = builder.Build();
 
-// Map endpoints with proper validation and error handling
-app.MapPost("/api/orders", async (CreateOrderRequest request, IOrderService orderService) =>
+// Endpoint mapping with validation
+app.MapPost("/api/orders", async (CreateOrderRequest request, IOrderService service) =>
 {
-    var result = await orderService.CreateOrderAsync(request);
+    var result = await service.CreateOrderAsync(request);
     return result.IsSuccess 
         ? Results.Created($"/api/orders/{result.Value.Id}", result.Value)
         : Results.BadRequest(result.Error);
 })
 .WithName("CreateOrder")
 .WithOpenApi()
-.Produces<OrderResponse>(StatusCodes.Status201Created)
-.Produces<ProblemDetails>(StatusCodes.Status400BadRequest);
-
-app.Run();
+.Produces<OrderResponse>(201)
+.Produces<ProblemDetails>(400);
 ```
 
-### Performance Patterns
+### Error Handling Pattern
 ```csharp
-// Use Span<T> for efficient string operations
-public static string FormatOrderId(ReadOnlySpan<char> prefix, int orderId)
+// Result pattern for error handling
+public record Result<T>(bool IsSuccess, T? Value, string? Error)
 {
-    Span<char> buffer = stackalloc char[32];
-    prefix.CopyTo(buffer);
-    
-    var orderIdSpan = buffer[prefix.Length..];
-    orderId.TryFormat(orderIdSpan, out var written);
-    
-    return new string(buffer[..(prefix.Length + written)]);
+    public static Result<T> Success(T value) => new(true, value, null);
+    public static Result<T> Failure(string error) => new(false, default, error);
 }
 
-// Efficient JSON serialization with source generators
-[JsonSerializable(typeof(OrderResponse))]
-[JsonSerializable(typeof(CreateOrderRequest))]
-public partial class OrderJsonContext : JsonSerializerContext { }
-
-// Use in API
-app.ConfigureHttpJsonOptions(options =>
+// Global exception handling
+app.UseExceptionHandler(exceptionHandlerApp =>
 {
-    options.SerializerOptions.TypeInfoResolverChain.Insert(0, OrderJsonContext.Default);
+    exceptionHandlerApp.Run(async context =>
+    {
+        var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+        var response = new ProblemDetails
+        {
+            Status = 500,
+            Title = "An error occurred",
+            Detail = exception?.Message
+        };
+        await context.Response.WriteAsJsonAsync(response);
+    });
 });
 ```
 
+## Performance Optimization
+
 ### Memory Management
 ```csharp
-// Use object pooling for frequently allocated objects
-public class OrderProcessor
+// Use Span<T> for high-performance operations
+public static int ProcessData(ReadOnlySpan<byte> data)
 {
-    private readonly ObjectPool<StringBuilder> _stringBuilderPool;
-    
-    public OrderProcessor(ObjectPool<StringBuilder> stringBuilderPool)
+    var sum = 0;
+    foreach (var b in data)
     {
-        _stringBuilderPool = stringBuilderPool;
+        sum += b;
     }
+    return sum;
+}
+
+// Object pooling for frequently allocated objects
+services.AddSingleton<ObjectPool<StringBuilder>>(serviceProvider =>
+{
+    var provider = serviceProvider.GetService<ObjectPoolProvider>();
+    return provider.CreateStringBuilderPool();
+});
+```
+
+### Async Best Practices
+```csharp
+// Proper async/await usage
+public async Task<OrderResponse> CreateOrderAsync(CreateOrderRequest request)
+{
+    // Use ConfigureAwait(false) in libraries
+    var order = await _repository.CreateAsync(request).ConfigureAwait(false);
     
-    public string ProcessOrder(Order order)
+    // Parallel operations when possible
+    var tasks = new[]
     {
-        var sb = _stringBuilderPool.Get();
-        try
-        {
-            // Use StringBuilder for string building
-            sb.AppendLine($"Order: {order.Id}");
-            sb.AppendLine($"Customer: {order.CustomerId}");
-            return sb.ToString();
-        }
-        finally
-        {
-            _stringBuilderPool.Return(sb);
-        }
-    }
+        _emailService.SendConfirmationAsync(order.Email),
+        _inventoryService.ReserveItemsAsync(order.Items),
+        _paymentService.ProcessPaymentAsync(order.Payment)
+    };
+    
+    await Task.WhenAll(tasks);
+    return order.ToResponse();
 }
 ```
 
-### Async Patterns
+## Security Implementation
+
+### Authentication & Authorization
 ```csharp
-// Proper async/await with ConfigureAwait
-public class OrderService
-{
-    private readonly HttpClient _httpClient;
-    
-    public async Task<OrderResult> ProcessOrderAsync(Order order, CancellationToken cancellationToken = default)
-    {
-        // Use ConfigureAwait(false) in library code
-        var response = await _httpClient.PostAsJsonAsync("/api/validate", order, cancellationToken)
-            .ConfigureAwait(false);
-        
-        if (!response.IsSuccessStatusCode)
-        {
-            return OrderResult.Failed("Validation failed");
-        }
-        
-        // Use ValueTask for potentially synchronous operations
-        var result = await SaveOrderAsync(order, cancellationToken).ConfigureAwait(false);
-        return OrderResult.Success(result);
-    }
-    
-    private ValueTask<Order> SaveOrderAsync(Order order, CancellationToken cancellationToken)
-    {
-        // Return completed ValueTask if already cached
-        if (_orderCache.TryGetValue(order.Id, out var cached))
-        {
-            return ValueTask.FromResult(cached);
-        }
-        
-        // Otherwise perform async operation
-        return new ValueTask<Order>(SaveOrderToDbAsync(order, cancellationToken));
-    }
-}
-```
-
-## Data Access Patterns
-
-### Entity Framework Core
-```csharp
-// Efficient EF Core patterns
-public class OrderRepository
-{
-    private readonly OrderContext _context;
-    
-    public async Task<Order?> GetOrderWithItemsAsync(int orderId)
-    {
-        // Use AsNoTracking for read-only queries
-        return await _context.Orders
-            .AsNoTracking()
-            .Include(o => o.Items)
-            .FirstOrDefaultAsync(o => o.Id == orderId);
-    }
-    
-    public async Task<IEnumerable<OrderSummary>> GetOrderSummariesAsync(int customerId)
-    {
-        // Project to DTOs to avoid loading full entities
-        return await _context.Orders
-            .Where(o => o.CustomerId == customerId)
-            .Select(o => new OrderSummary
-            {
-                Id = o.Id,
-                Total = o.Total,
-                Status = o.Status,
-                CreatedAt = o.CreatedAt
-            })
-            .ToListAsync();
-    }
-}
-```
-
-### Dapper for High Performance
-```csharp
-// Use Dapper for performance-critical queries
-public class OrderQueryService
-{
-    private readonly IDbConnection _connection;
-    
-    public async Task<IEnumerable<OrderSummary>> GetTopOrdersAsync(int limit)
-    {
-        const string sql = """
-            SELECT Id, CustomerId, Total, Status, CreatedAt 
-            FROM Orders 
-            ORDER BY Total DESC 
-            LIMIT @Limit
-            """;
-        
-        return await _connection.QueryAsync<OrderSummary>(sql, new { Limit = limit });
-    }
-}
-```
-
-## Error Handling and Validation
-
-### Result Pattern
-```csharp
-// Use Result pattern instead of exceptions for business logic
-public readonly record struct Result<T, TError>
-{
-    public T? Value { get; }
-    public TError? Error { get; }
-    public bool IsSuccess { get; }
-    
-    private Result(T value)
-    {
-        Value = value;
-        Error = default;
-        IsSuccess = true;
-    }
-    
-    private Result(TError error)
-    {
-        Value = default;
-        Error = error;
-        IsSuccess = false;
-    }
-    
-    public static Result<T, TError> Success(T value) => new(value);
-    public static Result<T, TError> Failure(TError error) => new(error);
-}
-```
-
-### Input Validation
-```csharp
-// Use FluentValidation for complex validation
-public class CreateOrderRequestValidator : AbstractValidator<CreateOrderRequest>
-{
-    public CreateOrderRequestValidator()
-    {
-        RuleFor(x => x.CustomerId)
-            .NotEmpty()
-            .WithMessage("Customer ID is required");
-            
-        RuleFor(x => x.Items)
-            .NotEmpty()
-            .WithMessage("Order must contain at least one item");
-            
-        RuleForEach(x => x.Items)
-            .SetValidator(new OrderItemValidator());
-    }
-}
-```
-
-## Testing Patterns
-
-### Unit Testing
-```csharp
-// Use record types for test data
-public record OrderTestData(
-    int Id,
-    int CustomerId,
-    decimal Total,
-    OrderStatus Status = OrderStatus.Pending);
-
-[Fact]
-public async Task CreateOrder_WithValidData_ReturnsSuccess()
-{
-    // Arrange
-    var testData = new OrderTestData(1, 123, 99.99m);
-    var mockRepository = new Mock<IOrderRepository>();
-    var service = new OrderService(mockRepository.Object);
-    
-    // Act
-    var result = await service.CreateOrderAsync(testData.ToCreateRequest());
-    
-    // Assert
-    result.IsSuccess.Should().BeTrue();
-    result.Value.Total.Should().Be(testData.Total);
-}
-```
-
-### Integration Testing
-```csharp
-// Use WebApplicationFactory for API testing
-public class OrderApiTests : IClassFixture<WebApplicationFactory<Program>>
-{
-    private readonly WebApplicationFactory<Program> _factory;
-    private readonly HttpClient _client;
-    
-    public OrderApiTests(WebApplicationFactory<Program> factory)
-    {
-        _factory = factory;
-        _client = factory.CreateClient();
-    }
-    
-    [Fact]
-    public async Task CreateOrder_ReturnsCreatedOrder()
-    {
-        // Arrange
-        var request = new CreateOrderRequest { CustomerId = 123, Items = [...] };
-        
-        // Act
-        var response = await _client.PostAsJsonAsync("/api/orders", request);
-        
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
-        var order = await response.Content.ReadFromJsonAsync<OrderResponse>();
-        order.Should().NotBeNull();
-    }
-}
-```
-
-## Anti-Patterns
-
-### Avoid These Approaches
-- **Blocking Async Code** - Using .Result or .Wait() on async methods
-- **Excessive Allocations** - Creating unnecessary objects in hot paths
-- **Reflection in Hot Paths** - Use source generators instead
-- **Ignoring Cancellation** - Not passing CancellationToken through async chains
-- **Poor Exception Handling** - Using exceptions for control flow
-
-### Common Mistakes
-- Not using ConfigureAwait(false) in library code
-- Mixing async and sync code incorrectly
-- Not disposing IDisposable resources properly
-- Ignoring nullable reference type warnings
-- Using outdated patterns from .NET Framework
-
-## Security Best Practices
-
-### Authentication and Authorization
-```csharp
-// Use JWT Bearer authentication
+// JWT authentication setup
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -345,49 +147,247 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Use policy-based authorization
+// Policy-based authorization
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("RequireManagerRole", policy =>
-        policy.RequireRole("Manager"));
+    options.AddPolicy("AdminOnly", policy => 
+        policy.RequireRole("Admin"));
+    options.AddPolicy("CanManageOrders", policy =>
+        policy.RequireClaim("permission", "orders:manage"));
 });
 ```
 
-### Input Sanitization
+### Input Validation
 ```csharp
-// Sanitize user input
-public class OrderController : ControllerBase
+// Data annotations with custom validation
+public record CreateOrderRequest
 {
-    [HttpPost]
-    public async Task<IActionResult> CreateOrder([FromBody] CreateOrderRequest request)
+    [Required, EmailAddress]
+    public string Email { get; init; } = string.Empty;
+    
+    [Required, Range(0.01, double.MaxValue)]
+    public decimal Amount { get; init; }
+    
+    [Required, MinLength(1)]
+    public List<OrderItem> Items { get; init; } = new();
+}
+
+// FluentValidation for complex scenarios
+public class CreateOrderValidator : AbstractValidator<CreateOrderRequest>
+{
+    public CreateOrderValidator()
     {
-        // Validate and sanitize input
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-        
-        // Use parameterized queries to prevent SQL injection
-        var sanitizedRequest = new CreateOrderRequest
-        {
-            CustomerId = request.CustomerId,
-            Items = request.Items.Select(SanitizeOrderItem).ToList()
-        };
-        
-        var result = await _orderService.CreateOrderAsync(sanitizedRequest);
-        return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        RuleFor(x => x.Email).NotEmpty().EmailAddress();
+        RuleFor(x => x.Amount).GreaterThan(0);
+        RuleFor(x => x.Items).NotEmpty();
+        RuleForEach(x => x.Items).SetValidator(new OrderItemValidator());
     }
 }
 ```
 
-## Summary
+## Database Integration
 
-Modern .NET development emphasizes performance, security, and maintainability through proper use of platform features, async patterns, and cloud-native design. Focus on minimal APIs, efficient memory usage, and proper error handling while leveraging source generators and nullable reference types for better developer experience.
+### Entity Framework Core Best Practices
+```csharp
+// DbContext configuration
+public class OrderContext : DbContext
+{
+    public OrderContext(DbContextOptions<OrderContext> options) : base(options) { }
+    
+    public DbSet<Order> Orders => Set<Order>();
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Configure entities
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Amount).HasPrecision(18, 2);
+            entity.HasIndex(e => e.Email);
+        });
+    }
+}
 
-Key decision points:
-- Use minimal APIs for lightweight HTTP services
-- Apply Span<T> and Memory<T> for performance-critical code
-- Implement proper async/await patterns with cancellation
-- Use source generators instead of runtime reflection
-- Apply nullable reference types for compile-time safety
-- Design for cloud-native deployment and scaling
+// Repository pattern with async operations
+public class OrderRepository : IOrderRepository
+{
+    private readonly OrderContext _context;
+    
+    public async Task<Order?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        return await _context.Orders
+            .Include(o => o.Items)
+            .FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
+    }
+    
+    public async Task<Order> CreateAsync(Order order, CancellationToken cancellationToken = default)
+    {
+        _context.Orders.Add(order);
+        await _context.SaveChangesAsync(cancellationToken);
+        return order;
+    }
+}
+```
+
+## Testing Strategy
+
+### Unit Testing with xUnit
+```csharp
+public class OrderServiceTests
+{
+    private readonly Mock<IOrderRepository> _mockRepository;
+    private readonly OrderService _service;
+    
+    public OrderServiceTests()
+    {
+        _mockRepository = new Mock<IOrderRepository>();
+        _service = new OrderService(_mockRepository.Object);
+    }
+    
+    [Fact]
+    public async Task CreateOrderAsync_ValidRequest_ReturnsSuccess()
+    {
+        // Arrange
+        var request = new CreateOrderRequest { Email = "test@example.com", Amount = 100 };
+        var expectedOrder = new Order { Id = 1, Email = request.Email, Amount = request.Amount };
+        
+        _mockRepository.Setup(r => r.CreateAsync(It.IsAny<Order>(), default))
+                      .ReturnsAsync(expectedOrder);
+        
+        // Act
+        var result = await _service.CreateOrderAsync(request);
+        
+        // Assert
+        Assert.True(result.IsSuccess);
+        Assert.Equal(expectedOrder.Id, result.Value?.Id);
+    }
+}
+```
+
+### Integration Testing
+```csharp
+public class OrderApiTests : IClassFixture<WebApplicationFactory<Program>>
+{
+    private readonly WebApplicationFactory<Program> _factory;
+    private readonly HttpClient _client;
+    
+    public OrderApiTests(WebApplicationFactory<Program> factory)
+    {
+        _factory = factory;
+        _client = _factory.CreateClient();
+    }
+    
+    [Fact]
+    public async Task CreateOrder_ValidRequest_ReturnsCreated()
+    {
+        // Arrange
+        var request = new CreateOrderRequest { Email = "test@example.com", Amount = 100 };
+        
+        // Act
+        var response = await _client.PostAsJsonAsync("/api/orders", request);
+        
+        // Assert
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var order = await response.Content.ReadFromJsonAsync<OrderResponse>();
+        Assert.NotNull(order);
+    }
+}
+```
+
+## Cloud Deployment
+
+### Docker Configuration
+```dockerfile
+# Multi-stage build for optimized images
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["MyApp.csproj", "."]
+RUN dotnet restore
+COPY . .
+RUN dotnet publish -c Release -o /app/publish --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "MyApp.dll"]
+```
+
+### Health Checks
+```csharp
+// Health check configuration
+builder.Services.AddHealthChecks()
+    .AddDbContext<OrderContext>()
+    .AddUrlGroup(new Uri("https://external-api.com/health"), "external-api");
+
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+```
+
+## Configuration Management
+
+### Strongly-Typed Configuration
+```csharp
+// Configuration classes
+public class JwtSettings
+{
+    public string Issuer { get; set; } = string.Empty;
+    public string Audience { get; set; } = string.Empty;
+    public string Key { get; set; } = string.Empty;
+    public int ExpirationMinutes { get; set; } = 60;
+}
+
+// Registration
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("Jwt"));
+
+// Usage with IOptions
+public class AuthService
+{
+    private readonly JwtSettings _jwtSettings;
+    
+    public AuthService(IOptions<JwtSettings> jwtSettings)
+    {
+        _jwtSettings = jwtSettings.Value;
+    }
+}
+```
+
+## Monitoring Integration
+
+### Logging with Serilog
+```csharp
+// Serilog configuration
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration)
+                 .Enrich.FromLogContext()
+                 .WriteTo.Console()
+                 .WriteTo.ApplicationInsights());
+
+// Structured logging usage
+_logger.LogInformation("Order {OrderId} created for user {UserId} with amount {Amount:C}",
+    order.Id, order.UserId, order.Amount);
+```
+
+## Best Practices Summary
+
+### Do's
+- ✅ Use minimal APIs for simple endpoints
+- ✅ Implement proper error handling with Result patterns
+- ✅ Use async/await consistently
+- ✅ Apply nullable reference types
+- ✅ Use Span<T> for high-performance scenarios
+- ✅ Implement comprehensive logging
+- ✅ Use strongly-typed configuration
+
+### Don'ts
+- ❌ Block async calls with .Result or .Wait()
+- ❌ Ignore cancellation tokens
+- ❌ Use exceptions for control flow
+- ❌ Forget to dispose resources
+- ❌ Use reflection in hot paths
+- ❌ Ignore security best practices
+- ❌ Skip input validation

@@ -11,6 +11,15 @@
       "dependencies": []
     },
     {
+      "id": "jmeter-strategy",
+      "name": "JMeter Performance Testing Strategy",
+      "description": "Apache JMeter performance testing with load testing, CI/CD integration, and distributed testing guidance",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": "strategy-jmeter.md",
+      "dependencies": []
+    },
+    {
       "id": "security-strategy",
       "name": "SABSA Security Strategy",
       "description": "Security architecture, threat modeling (STRIDE), and compliance (GDPR, HIPAA, SOC2)",

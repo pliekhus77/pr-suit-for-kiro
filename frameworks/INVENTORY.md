@@ -26,6 +26,7 @@
 - **Dual-track Development** - Discovery and delivery tracks
 
 ### Testing Frameworks & Tools
+- **JMeter Performance Testing** - Comprehensive Apache JMeter performance testing strategy guide
 - **Reqnroll** - .NET BDD testing framework (SpecFlow successor)
 - **Playwright** - Cross-browser automation library
 - **JUnit** - Java unit testing framework
