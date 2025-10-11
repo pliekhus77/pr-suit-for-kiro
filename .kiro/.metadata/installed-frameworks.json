@@ -1,12 +1,6 @@
 {
   "frameworks": [
     {
-      "id": "c4-model-strategy",
-      "version": "1.0.0",
-      "installedAt": "2025-10-07T09:36:27.591Z",
-      "customized": false
-    },
-    {
       "id": "tdd-bdd-strategy",
       "version": "1.0.0",
       "installedAt": "2025-10-07T09:39:42.766Z",
@@ -16,6 +10,18 @@
       "id": "4d-safe-strategy",
       "version": "1.0.0",
       "installedAt": "2025-10-07T09:39:57.712Z",
+      "customized": false
+    },
+    {
+      "id": "c4-model-strategy",
+      "version": "1.0.0",
+      "installedAt": "2025-10-07T11:15:05.607Z",
+      "customized": false
+    },
+    {
+      "id": "security-strategy",
+      "version": "1.0.0",
+      "installedAt": "2025-10-07T11:15:41.678Z",
       "customized": false
     }
   ]

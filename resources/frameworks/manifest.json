@@ -2,39 +2,30 @@
   "version": "1.0.0",
   "frameworks": [
     {
-      "id": "tdd-bdd-strategy",
-      "name": "TDD/BDD Testing Strategy",
-      "description": "Test-driven and behavior-driven development practices with testing-plan.md requirements",
-      "category": "testing",
+      "id": "dotnet-strategy",
+      "name": ".NET Best Practices",
+      "description": ".NET 8.0 development standards for performance, security, and maintainability",
+      "category": "development",
       "version": "1.0.0",
-      "fileName": "strategy-tdd-bdd.md",
+      "fileName": "strategy-dotnet.md",
       "dependencies": []
     },
     {
-      "id": "jmeter-strategy",
-      "name": "JMeter Performance Testing Strategy",
-      "description": "Apache JMeter performance testing with load testing, CI/CD integration, and distributed testing guidance",
-      "category": "testing",
+      "id": "4d-safe-strategy",
+      "name": "4D SDLC + SAFe Work Management",
+      "description": "Define-Design-Develop-Deploy phases with SAFe practices and WSJF prioritization",
+      "category": "work-management",
       "version": "1.0.0",
-      "fileName": "strategy-jmeter.md",
+      "fileName": "strategy-4d-safe.md",
       "dependencies": []
     },
     {
-      "id": "security-strategy",
-      "name": "SABSA Security Strategy",
-      "description": "Security architecture, threat modeling (STRIDE), and compliance (GDPR, HIPAA, SOC2)",
-      "category": "security",
+      "id": "apm-strategy",
+      "name": "APM Strategy",
+      "description": "Application Performance Monitoring with metrics, logs, traces, alerting, and cost optimization",
+      "category": "monitoring",
       "version": "1.0.0",
-      "fileName": "strategy-security.md",
-      "dependencies": []
-    },
-    {
-      "id": "c4-model-strategy",
-      "name": "C4 Model Architecture",
-      "description": "When and how to use C4 diagrams in specs (System Context, Container, Component, Dynamic)",
-      "category": "architecture",
-      "version": "1.0.0",
-      "fileName": "strategy-c4-model.md",
+      "fileName": "strategy-apm.md",
       "dependencies": []
     },
     {
@@ -56,30 +47,34 @@
       "dependencies": []
     },
     {
+      "id": "c4-model-strategy",
+      "name": "C4 Model Architecture",
+      "description": "When and how to use C4 diagrams in specs (System Context, Container, Component, Dynamic)",
+      "category": "architecture",
+      "version": "1.0.0",
+      "fileName": "strategy-c4-model.md",
+      "dependencies": []
+    },
+    {
+      "id": "clean-architecture",
+      "name": "Clean Architecture (Milan Jovanovic's Pragmatic Approach)",
+      "description": "Pragmatic Clean Architecture with four layers, CQRS with MediatR, vertical slice organization, and modern .NET practices",
+      "category": "architecture",
+      "version": "1.0.0",
+      "fileName": "clean-architecture.md",
+      "dependencies": [
+        "ddd-strategy",
+        "dotnet-strategy",
+        "tdd-bdd-strategy"
+      ]
+    },
+    {
       "id": "devops-strategy",
       "name": "DevOps CI/CD Strategy",
       "description": "Continuous integration/deployment, DORA metrics, and deployment strategies",
       "category": "devops",
       "version": "1.0.0",
       "fileName": "strategy-devops.md",
-      "dependencies": []
-    },
-    {
-      "id": "apm-strategy",
-      "name": "APM Strategy",
-      "description": "Application Performance Monitoring with metrics, logs, traces, alerting, and cost optimization",
-      "category": "monitoring",
-      "version": "1.0.0",
-      "fileName": "strategy-apm.md",
-      "dependencies": []
-    },
-    {
-      "id": "iac-strategy",
-      "name": "Infrastructure as Code (Pulumi)",
-      "description": "IaC patterns and best practices with Pulumi (real programming languages)",
-      "category": "infrastructure",
-      "version": "1.0.0",
-      "fileName": "strategy-iac.md",
       "dependencies": []
     },
     {
@@ -92,22 +87,16 @@
       "dependencies": []
     },
     {
-      "id": "dotnet-strategy",
-      "name": ".NET Best Practices",
-      "description": ".NET 8.0 development standards for performance, security, and maintainability",
-      "category": "development",
+      "id": "entity-framework-strategy",
+      "name": "Entity Framework Strategy",
+      "description": "Microsoft's ORM for .NET applications with code-first development, migrations, and performance optimization",
+      "category": "database",
       "version": "1.0.0",
-      "fileName": "strategy-dotnet.md",
-      "dependencies": []
-    },
-    {
-      "id": "4d-safe-strategy",
-      "name": "4D SDLC + SAFe Work Management",
-      "description": "Define-Design-Develop-Deploy phases with SAFe practices and WSJF prioritization",
-      "category": "work-management",
-      "version": "1.0.0",
-      "fileName": "strategy-4d-safe.md",
-      "dependencies": []
+      "fileName": "strategy-entity-framework.md",
+      "dependencies": [
+        "ddd-strategy",
+        "dotnet-strategy"
+      ]
     },
     {
       "id": "ea-strategy",
@@ -116,6 +105,33 @@
       "category": "architecture",
       "version": "1.0.0",
       "fileName": "strategy-ea.md",
+      "dependencies": []
+    },
+    {
+      "id": "iac-strategy",
+      "name": "Infrastructure as Code (Pulumi)",
+      "description": "IaC patterns and best practices with Pulumi (real programming languages)",
+      "category": "infrastructure",
+      "version": "1.0.0",
+      "fileName": "strategy-iac.md",
+      "dependencies": []
+    },
+    {
+      "id": "jmeter-strategy",
+      "name": "JMeter Performance Testing Strategy",
+      "description": "Apache JMeter performance testing with load testing, CI/CD integration, and distributed testing guidance",
+      "category": "testing",
+      "version": "1.0.0",
+      "fileName": "strategy-jmeter.md",
+      "dependencies": []
+    },
+    {
+      "id": "security-strategy",
+      "name": "SABSA Security Strategy",
+      "description": "Security architecture, threat modeling (STRIDE), and compliance (GDPR, HIPAA, SOC2)",
+      "category": "security",
+      "version": "1.0.0",
+      "fileName": "strategy-security.md",
       "dependencies": []
     },
     {
@@ -128,13 +144,13 @@
       "dependencies": []
     },
     {
-      "id": "entity-framework-strategy",
-      "name": "Entity Framework Strategy",
-      "description": "Microsoft's ORM for .NET applications with code-first development, migrations, and performance optimization",
-      "category": "database",
+      "id": "tdd-bdd-strategy",
+      "name": "TDD/BDD Testing Strategy",
+      "description": "Test-driven and behavior-driven development practices with testing-plan.md requirements",
+      "category": "testing",
       "version": "1.0.0",
-      "fileName": "strategy-entity-framework.md",
-      "dependencies": ["ddd-strategy", "dotnet-strategy"]
+      "fileName": "strategy-tdd-bdd.md",
+      "dependencies": []
     }
   ]
 }

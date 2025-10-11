@@ -6,6 +6,11 @@ import { FileSystemOperations } from '../../utils/file-system';
 import { FrameworkManager } from '../../services/framework-manager';
 // import { initializeWorkspaceCommand } from '../../commands/workspace-commands';
 
+// Mock function for deprecated command
+const initializeWorkspaceCommand = async (..._args: unknown[]) => {
+  // Deprecated function - no-op for tests
+};
+
 suite.skip('Workspace Initialization Integration Tests', () => {
   let workspaceRoot: string;
   let fileSystem: FileSystemOperations;

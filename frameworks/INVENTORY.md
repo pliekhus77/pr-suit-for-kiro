@@ -8,7 +8,12 @@
 - **SABSA Framework** - Security architecture methodology
 - **AWS Well-Architected Framework** - Cloud architecture best practices
 - **Azure Well-Architected Framework** - Microsoft cloud architecture
-- **Clean Architecture** - Layered architecture pattern
+- **Pragmatic Clean Architecture** - Milan Jovanovic's four-layer architecture with CQRS, vertical slices, and modern .NET practices. Emphasizes practical implementation over dogmatic adherence. Includes Domain, Application, Infrastructure, and Presentation layers with MediatR integration, Entity Framework Core, and pragmatic flexibility for breaking rules when beneficial. [Framework Documentation](frameworks/clean-architecture.md) | [Team Guidelines](.kiro/steering/strategy-pragmatic-clean-architecture.md)
+  - **Use When:** Complex business logic, multiple data sources, long-term maintenance, 3+ developers, comprehensive testing needs, external dependencies, compliance requirements
+  - **Avoid When:** Simple CRUD operations, prototypes, small teams (1-2 devs), tight deadlines, well-known stable domains
+  - **Key Patterns:** Four-layer dependency rules, CQRS with MediatR, vertical slice organization, REPR pattern, entity-based folder structure
+  - **Tech Stack:** .NET Core, Entity Framework Core, MediatR, FluentValidation, Serilog, JWT authentication, Docker containerization
+  - **Pragmatic Flexibility:** Document architectural overrides in ADRs when strict adherence adds unnecessary complexity
 - **Hexagonal Architecture** - Ports and adapters pattern
 - **Event-Driven Architecture** - Asynchronous communication pattern
 - **Microservices Architecture** - Distributed system design

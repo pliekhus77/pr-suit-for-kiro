@@ -9,7 +9,7 @@ import { FrameworkReferenceManager, SearchResult } from '../services/framework-r
  * Creates .kiro/ directory structure and optionally installs recommended frameworks
  */
 /* istanbul ignore next */
-async function initializeWorkspaceCommand_DEPRECATED(
+async function _initializeWorkspaceCommand_DEPRECATED(
   context: vscode.ExtensionContext,
   fileSystem: FileSystemOperations,
   frameworkManager: FrameworkManager
