@@ -48,11 +48,12 @@ function info(message) {
 
 function execCommand(command, options = {}) {
     try {
-        return execSync(command, { 
+        const result = execSync(command, { 
             encoding: 'utf8', 
             stdio: options.silent ? 'pipe' : 'inherit',
             ...options 
-        }).trim();
+        });
+        return result ? result.trim() : '';
     } catch (err) {
         if (!options.silent) {
             error(`Command failed: ${command}`);
