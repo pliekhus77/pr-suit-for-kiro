@@ -1,0 +1,501 @@
+name: Release Extension
+
+# Trigger on version tag pushes
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+# Ensure only one release workflow runs at a time
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate-tag:
+    name: Validate Tag Format
+    runs-on: ubuntu-latest
+    
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+      is-valid: ${{ steps.validate.outputs.is-valid }}
+    
+    steps:
+      - name: Extract version from tag
+        id: extract
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          VERSION="${TAG_NAME#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+      
+      - name: Validate semantic version format
+        id: validate
+        run: |
+          VERSION="${{ steps.extract.outputs.version }}"
+          
+          # Regex for semantic versioning (MAJOR.MINOR.PATCH with optional pre-release and build metadata)
+          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
+            echo "✅ Valid semantic version: $VERSION"
+            echo "is-valid=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Invalid semantic version format: $VERSION"
+            echo "Expected format: MAJOR.MINOR.PATCH (e.g., 1.2.3)"
+            echo "is-valid=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    needs: validate-tag
+    
+    if: needs.validate-tag.outputs.is-valid == 'true'
+    
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Compile TypeScript
+        run: npm run compile
+      
+      - name: Run ESLint
+        run: npm run lint
+      
+      - name: Run tests with coverage
+        run: npm test -- --coverage --coverageReporters=text --coverageReporters=json-summary
+      
+      - name: Check coverage threshold
+        run: |
+          if [ -f "coverage/coverage-summary.json" ]; then
+            LINES=$(jq '.total.lines.pct' coverage/coverage-summary.json)
+            THRESHOLD=80
+            
+            if (( $(echo "$LINES >= $THRESHOLD" | bc -l) )); then
+              echo "✅ Coverage threshold met: ${LINES}%"
+            else
+              echo "❌ Coverage below threshold: ${LINES}% (minimum: ${THRESHOLD}%)"
+              exit 1
+            fi
+          else
+            echo "❌ Coverage report not found"
+            exit 1
+          fi
+
+  package:
+    name: Build and Package VSIX
+    runs-on: ubuntu-latest
+    needs: [validate-tag, build-and-test]
+    
+    outputs:
+      vsix-file: ${{ steps.package.outputs.vsix-file }}
+      file-size: ${{ steps.verify.outputs.file-size }}
+    
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install production dependencies
+        run: npm ci --production
+      
+      - name: Install dev dependencies for build
+        run: npm install --save-dev typescript @types/node @types/vscode
+      
+      - name: Compile TypeScript (production mode)
+        run: npm run compile
+        env:
+          NODE_ENV: production
+      
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+      
+      - name: Package extension
+        id: package
+        run: |
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          echo "Packaging extension version $VERSION..."
+          
+          vsce package --out "pragmatic-rhino-suit-${VERSION}.vsix"
+          
+          VSIX_FILE="pragmatic-rhino-suit-${VERSION}.vsix"
+          echo "vsix-file=$VSIX_FILE" >> $GITHUB_OUTPUT
+          echo "✅ VSIX created: $VSIX_FILE"
+      
+      - name: Verify VSIX file
+        id: verify
+        run: |
+          VSIX_FILE="${{ steps.package.outputs.vsix-file }}"
+          
+          if [ ! -f "$VSIX_FILE" ]; then
+            echo "❌ VSIX file not found: $VSIX_FILE"
+            exit 1
+          fi
+          
+          FILE_SIZE=$(stat -c%s "$VSIX_FILE" 2>/dev/null || stat -f%z "$VSIX_FILE")
+          echo "file-size=$FILE_SIZE" >> $GITHUB_OUTPUT
+          echo "✅ VSIX file exists: $VSIX_FILE ($FILE_SIZE bytes)"
+      
+      - name: Validate VSIX package
+        run: |
+          VSIX_FILE="${{ steps.package.outputs.vsix-file }}"
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          
+          echo "🔍 Validating VSIX package..."
+          node scripts/validate-vsix.js "$VSIX_FILE" "$VERSION"
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ VSIX validation passed"
+          else
+            echo "❌ VSIX validation failed"
+            exit 1
+          fi
+      
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix-package-${{ needs.validate-tag.outputs.version }}
+          path: ${{ steps.package.outputs.vsix-file }}
+          retention-days: 90
+          if-no-files-found: error
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate-tag, build-and-test, package]
+    
+    outputs:
+      release-id: ${{ steps.create-release.outputs.id }}
+      release-url: ${{ steps.create-release.outputs.html_url }}
+      upload-url: ${{ steps.create-release.outputs.upload_url }}
+    
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Generate changelog
+        id: changelog
+        run: |
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          echo "Generating changelog for version $VERSION..."
+          
+          # Generate changelog using script
+          node scripts/generate-changelog.js "$VERSION" > release-notes.md
+          
+          echo "✅ Changelog generated"
+      
+      - name: Create GitHub Release
+        id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: "Pragmatic Rhino SUIT v${{ needs.validate-tag.outputs.version }}"
+          body_path: release-notes.md
+          draft: false
+          prerelease: ${{ contains(needs.validate-tag.outputs.version, '-') }}
+      
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-package-${{ needs.validate-tag.outputs.version }}
+          path: ./artifacts/
+      
+      - name: Upload VSIX to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./artifacts/${{ needs.package.outputs.vsix-file }}
+          asset_name: ${{ needs.package.outputs.vsix-file }}
+          asset_content_type: application/zip
+      
+      - name: Generate release summary
+        run: |
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          RELEASE_URL="${{ steps.create-release.outputs.html_url }}"
+          FILE_SIZE_MB=$(echo "scale=2; ${{ needs.package.outputs.file-size }} / 1024 / 1024" | bc)
+          
+          echo "## 🚀 Release Created Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "**Release:** [$RELEASE_URL]($RELEASE_URL)" >> $GITHUB_STEP_SUMMARY
+          echo "**VSIX Size:** ${FILE_SIZE_MB} MB" >> $GITHUB_STEP_SUMMARY
+          echo "**Pre-release:** ${{ contains(needs.validate-tag.outputs.version, '-') }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Assets" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ VSIX package uploaded to release" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Release notes generated from changelog" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📝 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. The release has been created with the VSIX package attached" >> $GITHUB_STEP_SUMMARY
+          echo "2. Users can download the VSIX from the release page" >> $GITHUB_STEP_SUMMARY
+          echo "3. Install manually: \`code --install-extension ${{ needs.package.outputs.vsix-file }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "4. Consider publishing to VS Code Marketplace if ready" >> $GITHUB_STEP_SUMMARY
+
+  publish-marketplace:
+    name: Publish to VS Code Marketplace
+    runs-on: ubuntu-latest
+    needs: [validate-tag, build-and-test, package, create-release]
+    
+    # Only run if VSCE_PAT secret is available and not a pre-release
+    if: ${{ secrets.VSCE_PAT != '' && !contains(needs.validate-tag.outputs.version, '-') }}
+    
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Download VSIX artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix-package-${{ needs.validate-tag.outputs.version }}
+          path: ./artifacts/
+      
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+      
+      - name: Publish to VS Code Marketplace
+        id: publish
+        run: |
+          VSIX_FILE="./artifacts/${{ needs.package.outputs.vsix-file }}"
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          
+          echo "🚀 Publishing extension to VS Code Marketplace..."
+          echo "📦 VSIX File: $VSIX_FILE"
+          echo "📌 Version: $VERSION"
+          
+          # Publish with retry logic
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          RETRY_DELAY=10
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if vsce publish --packagePath "$VSIX_FILE" --pat "${{ secrets.VSCE_PAT }}"; then
+              echo "publish-success=true" >> $GITHUB_OUTPUT
+              echo "✅ Extension published successfully!"
+              break
+            else
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "⚠️ Publish attempt $RETRY_COUNT failed. Retrying in ${RETRY_DELAY}s..."
+                sleep $RETRY_DELAY
+                RETRY_DELAY=$((RETRY_DELAY * 2))
+              else
+                echo "publish-success=false" >> $GITHUB_OUTPUT
+                echo "❌ Failed to publish after $MAX_RETRIES attempts"
+                exit 1
+              fi
+            fi
+          done
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      
+      - name: Wait for marketplace processing
+        run: |
+          echo "⏳ Waiting for marketplace to process the extension..."
+          sleep 60
+      
+      - name: Verify deployment on marketplace
+        id: verify
+        run: |
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          EXTENSION_ID="pragmatic-rhino.pragmatic-rhino-suit"
+          
+          echo "🔍 Verifying extension is live on marketplace..."
+          
+          if node scripts/verify-deployment.js "$EXTENSION_ID" "$VERSION"; then
+            echo "verify-success=true" >> $GITHUB_OUTPUT
+            echo "✅ Deployment verification passed!"
+          else
+            echo "verify-success=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Deployment verification failed (may need manual check)"
+          fi
+      
+      - name: Update release with marketplace info
+        if: steps.publish.outputs.publish-success == 'true'
+        run: |
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          RELEASE_ID="${{ needs.create-release.outputs.release-id }}"
+          MARKETPLACE_URL="https://marketplace.visualstudio.com/items?itemName=pragmatic-rhino.pragmatic-rhino-suit"
+          
+          echo "📝 Updating release with marketplace information..."
+          
+          # Add marketplace info to release
+          node scripts/post-release-comment.js \
+            "$RELEASE_ID" \
+            "$VERSION" \
+            "$MARKETPLACE_URL" \
+            --marketplace-published \
+            --verification-status "${{ steps.verify.outputs.verify-success }}"
+          
+          echo "✅ Release updated with marketplace information"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
+  notify-completion:
+    name: Send Completion Notification
+    runs-on: ubuntu-latest
+    needs: [validate-tag, build-and-test, package, create-release, publish-marketplace]
+    
+    # Always run this job, even if marketplace publishing is skipped or fails
+    if: always() && needs.create-release.result == 'success'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Send success notification
+        if: needs.create-release.result == 'success'
+        run: |
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          RELEASE_URL="${{ needs.create-release.outputs.release-url }}"
+          WORKFLOW_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          FILE_SIZE_MB=$(echo "scale=2; ${{ needs.package.outputs.file-size }} / 1024 / 1024" | bc)
+          
+          # Determine marketplace status
+          if [ "${{ needs.publish-marketplace.result }}" == "success" ]; then
+            MARKETPLACE_STATUS="✅ Published to VS Code Marketplace"
+            MARKETPLACE_URL="https://marketplace.visualstudio.com/items?itemName=pragmatic-rhino.pragmatic-rhino-suit"
+          elif [ "${{ needs.publish-marketplace.result }}" == "skipped" ]; then
+            MARKETPLACE_STATUS="⏭️ Marketplace publishing skipped (pre-release or no VSCE_PAT)"
+            MARKETPLACE_URL=""
+          else
+            MARKETPLACE_STATUS="❌ Marketplace publishing failed"
+            MARKETPLACE_URL=""
+          fi
+          
+          echo "📢 Sending release completion notification..."
+          
+          # Build notification message
+          MESSAGE="🚀 Pragmatic Rhino SUIT v$VERSION released successfully!"
+          DETAILS="Release: $RELEASE_URL | Package Size: ${FILE_SIZE_MB} MB | $MARKETPLACE_STATUS"
+          
+          # Send notification
+          node scripts/send-notification.js \
+            --type release \
+            --status success \
+            --message "$MESSAGE" \
+            --details "$DETAILS" \
+            --version "$VERSION" \
+            --release-url "$RELEASE_URL" \
+            --marketplace-url "$MARKETPLACE_URL" \
+            --workflow-url "$WORKFLOW_URL" \
+            --channel github
+          
+          echo "✅ Release notification sent successfully"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+      
+      - name: Generate final summary
+        if: always()
+        run: |
+          VERSION="${{ needs.validate-tag.outputs.version }}"
+          RELEASE_URL="${{ needs.create-release.outputs.release-url }}"
+          FILE_SIZE_MB=$(echo "scale=2; ${{ needs.package.outputs.file-size }} / 1024 / 1024" | bc)
+          
+          echo "## 🎉 Release Workflow Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "**Release:** [$RELEASE_URL]($RELEASE_URL)" >> $GITHUB_STEP_SUMMARY
+          echo "**Package Size:** ${FILE_SIZE_MB} MB" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "### 📊 Workflow Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Tag Validation | ${{ needs.validate-tag.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build & Test | ${{ needs.build-and-test.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Package VSIX | ${{ needs.package.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Create Release | ${{ needs.create-release.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.publish-marketplace.result }}" == "success" ]; then
+            echo "| Marketplace Publish | ✅ Published |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.publish-marketplace.result }}" == "skipped" ]; then
+            echo "| Marketplace Publish | ⏭️ Skipped |" >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ needs.publish-marketplace.result }}" == "failure" ]; then
+            echo "| Marketplace Publish | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Marketplace Publish | ⚠️ Unknown |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.create-release.result }}" == "success" ]; then
+            echo "### ✅ Release Successfully Created" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The extension has been packaged and released to GitHub." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 📦 Installation Options" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**From GitHub Release:**" >> $GITHUB_STEP_SUMMARY
+            echo "1. Download VSIX from [$RELEASE_URL]($RELEASE_URL)" >> $GITHUB_STEP_SUMMARY
+            echo "2. Install: \`code --install-extension pragmatic-rhino-suit-$VERSION.vsix\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "${{ needs.publish-marketplace.result }}" == "success" ]; then
+              echo "**From VS Code Marketplace:**" >> $GITHUB_STEP_SUMMARY
+              echo "1. Search for \"Pragmatic Rhino SUIT\" in VS Code Extensions" >> $GITHUB_STEP_SUMMARY
+              echo "2. Or install: \`code --install-extension pragmatic-rhino.pragmatic-rhino-suit\`" >> $GITHUB_STEP_SUMMARY
+              echo "3. Marketplace: [View Extension](https://marketplace.visualstudio.com/items?itemName=pragmatic-rhino.pragmatic-rhino-suit)" >> $GITHUB_STEP_SUMMARY
+            elif [ "${{ needs.publish-marketplace.result }}" == "skipped" ]; then
+              echo "**Marketplace Publishing:** Skipped (pre-release or VSCE_PAT not configured)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "**Marketplace Publishing:** Failed (see logs for details)" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "### ❌ Release Creation Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The release workflow encountered errors. Please check the failed steps above." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** [\`${{ github.sha }}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})" >> $GITHUB_STEP_SUMMARY

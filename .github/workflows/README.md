@@ -59,33 +59,39 @@ This directory contains GitHub Actions workflows for the CI/CD pipeline that bui
 
 ---
 
-#### `package.yml` - Extension Packaging
+#### `release.yml` - Complete Release Pipeline ⭐ **NEW**
 **Trigger:** Tag push matching `v*.*.*`  
-**Purpose:** Create VSIX package for marketplace deployment  
+**Purpose:** End-to-end release process with VSIX creation and GitHub release  
 **Key Steps:**
-- Validate tag format
-- Checkout tagged commit
-- Install production dependencies
-- Compile TypeScript
-- Run vsce package
-- Validate VSIX structure
-- Upload artifact (90-day retention)
+- Validate semantic version tag format
+- Build and test extension (full quality gates)
+- Create VSIX package with validation
+- Generate changelog and create GitHub release
+- Attach VSIX to release as downloadable asset
+- Optionally publish to VS Code Marketplace
+- Send completion notifications
+
+**Features:**
+- ✅ Complete release automation in single workflow
+- 📦 VSIX attached to GitHub releases for manual installation
+- 🌐 Automatic marketplace publishing (if VSCE_PAT configured)
+- 🔍 Pre-release detection (versions with `-alpha`, `-beta`, `-rc`)
+- 📊 Release metrics and verification
+- 🚀 Helper script: `npm run release:patch`
 
 ---
 
-#### `deploy.yml` - Marketplace Deployment
-**Trigger:** GitHub release published  
-**Purpose:** Publish extension to VS Code Marketplace  
-**Key Steps:**
-- Download VSIX artifact
-- Authenticate with marketplace (VSCE_PAT)
-- Publish using vsce
-- Verify deployment
-- Post success comment
-- Send notifications
+#### `package.yml` - Extension Packaging (Legacy)
+**Trigger:** Tag push matching `v*.*.*`  
+**Purpose:** Create VSIX package only (superseded by release.yml)  
+**Status:** ⚠️ Legacy - Use `release.yml` for new releases
 
-**Required Secrets:**
-- `VSCE_PAT` - VS Code Marketplace Personal Access Token
+---
+
+#### `deploy.yml` - Marketplace Deployment (Legacy)
+**Trigger:** GitHub release published  
+**Purpose:** Publish to VS Code Marketplace only (superseded by release.yml)  
+**Status:** ⚠️ Legacy - Use `release.yml` for new releases
 
 ---
 
@@ -114,13 +120,18 @@ pr-quality-gates.yml (on PR)
     ↓
 Merge to main
     ↓
-version.yml (creates tag)
+Create version tag (manual or script)
     ↓
-package.yml (on tag push)
-    ↓
-Maintainer creates release
-    ↓
-deploy.yml (publishes to marketplace)
+release.yml (complete release pipeline)
+    ├── Build & Test
+    ├── Package VSIX
+    ├── Create GitHub Release
+    └── Publish to Marketplace (optional)
+```
+
+### Legacy Flow (Deprecated)
+```
+version.yml (creates tag) → package.yml → deploy.yml
 ```
 
 ## Environment Configuration
@@ -207,13 +218,79 @@ See `docs/deployment/SECRETS.md` for detailed instructions.
 3. Check `.kiro/specs/github-actions-marketplace-deploy/` for requirements and design
 4. Contact repository maintainers
 
-## Manual Workflow Triggers
+## Release Process
 
-Some workflows can be triggered manually:
+### Quick Release (Recommended)
+Use the helper script for automated releases:
+
+```bash
+# Patch release (1.2.3 → 1.2.4)
+npm run release:patch
+
+# Minor release (1.2.3 → 1.3.0)  
+npm run release:minor
+
+# Major release (1.2.3 → 2.0.0)
+npm run release:major
+
+# Custom version
+npm run release 1.2.3-beta.1
+```
+
+The script will:
+1. ✅ Validate git state (clean working directory)
+2. 🧪 Run tests and check coverage
+3. 📝 Update package.json version
+4. 🏷️ Create and push git tag
+5. 🚀 Trigger automated release workflow
+
+### Manual Release
+For manual control:
+
+```bash
+# Update version in package.json
+npm version patch  # or minor, major
+
+# Create and push tag
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+### Pre-releases
+Create pre-release versions for testing:
+
+```bash
+# Beta release
+git tag v1.2.3-beta.1
+git push origin v1.2.3-beta.1
+
+# Alpha release
+git tag v1.2.3-alpha.1  
+git push origin v1.2.3-alpha.1
+
+# Release candidate
+git tag v1.2.3-rc.1
+git push origin v1.2.3-rc.1
+```
+
+**Note:** Pre-releases create GitHub pre-releases and do NOT publish to marketplace.
+
+### Installation Options
+
+**From GitHub Release (Always Available):**
+1. Go to [Releases page](../../releases)
+2. Download `.vsix` file from latest release
+3. Install: `code --install-extension pragmatic-rhino-suit-1.2.3.vsix`
+
+**From VS Code Marketplace (If Published):**
+1. Search "Pragmatic Rhino SUIT" in VS Code Extensions
+2. Or install: `code --install-extension pragmatic-rhino.pragmatic-rhino-suit`
+
+## Manual Workflow Triggers
 
 ### Rollback Workflow
 1. Go to Actions tab
-2. Select "Rollback" workflow
+2. Select "Rollback" workflow  
 3. Click "Run workflow"
 4. Enter version tag to rollback to
 5. Confirm execution
