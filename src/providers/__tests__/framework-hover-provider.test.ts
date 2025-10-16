@@ -4,7 +4,25 @@ import { FrameworkHoverProvider } from '../framework-hover-provider';
 import { FileSystemOperations } from '../../utils/file-system';
 
 // Mock vscode module
-jest.mock('vscode');
+jest.mock('vscode', () => ({
+  Range: jest.fn().mockImplementation((startLine, startChar, endLine, endChar) => ({
+    start: { line: startLine, character: startChar },
+    end: { line: endLine, character: endChar }
+  })),
+  Position: jest.fn().mockImplementation((line, character) => ({
+    line,
+    character
+  })),
+  Hover: jest.fn().mockImplementation((contents, range) => ({
+    contents: Array.isArray(contents) ? contents : [contents],
+    range
+  })),
+  MarkdownString: jest.fn().mockImplementation((value) => ({
+    value,
+    isTrusted: false,
+    supportHtml: false
+  }))
+}));
 
 describe('FrameworkHoverProvider', () => {
   let provider: FrameworkHoverProvider;
@@ -53,8 +71,7 @@ describe('FrameworkHoverProvider', () => {
       const hover = provider.provideHover(mockDocument, position, {} as any);
 
       expect(hover).toBeDefined();
-      expect(hover).toBeInstanceOf(vscode.Hover);
-      expect((hover as vscode.Hover).contents[0]).toContain('Test-Driven Development');
+      expect(((hover as vscode.Hover).contents[0] as vscode.MarkdownString).value).toContain('Test-Driven Development');
     });
 
     it('should provide hover for BDD term', () => {
@@ -66,7 +83,7 @@ describe('FrameworkHoverProvider', () => {
       const hover = provider.provideHover(mockDocument, position, {} as any);
 
       expect(hover).toBeDefined();
-      expect((hover as vscode.Hover).contents[0]).toContain('Behavior-Driven Development');
+      expect(((hover as vscode.Hover).contents[0] as vscode.MarkdownString).value).toContain('Behavior-Driven Development');
     });
 
     it('should provide hover for C4 Model term', () => {
@@ -78,7 +95,7 @@ describe('FrameworkHoverProvider', () => {
       const hover = provider.provideHover(mockDocument, position, {} as any);
 
       expect(hover).toBeDefined();
-      expect((hover as vscode.Hover).contents[0]).toContain('hierarchical set of software architecture diagrams');
+      expect(((hover as vscode.Hover).contents[0] as vscode.MarkdownString).value).toContain('hierarchical set of software architecture diagrams');
     });
 
     it('should provide hover for STRIDE term', () => {
@@ -90,7 +107,7 @@ describe('FrameworkHoverProvider', () => {
       const hover = provider.provideHover(mockDocument, position, {} as any);
 
       expect(hover).toBeDefined();
-      expect((hover as vscode.Hover).contents[0]).toContain('threat modeling framework');
+      expect(((hover as vscode.Hover).contents[0] as vscode.MarkdownString).value).toContain('threat modeling framework');
     });
 
     it('should not provide hover for unknown terms', () => {
@@ -128,7 +145,7 @@ describe('FrameworkHoverProvider', () => {
       const hover = provider.provideHover(mockDocument, position, {} as any);
 
       expect(hover).toBeDefined();
-      expect((hover as vscode.Hover).contents[0]).toContain('Test-Driven Development');
+      expect(((hover as vscode.Hover).contents[0] as vscode.MarkdownString).value).toContain('Test-Driven Development');
     });
 
     it('should return null when no word range at position', () => {

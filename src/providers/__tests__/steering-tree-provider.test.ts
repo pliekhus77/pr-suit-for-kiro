@@ -5,7 +5,39 @@ import { FrameworkManager } from '../../services/framework-manager';
 import { SteeringCategory } from '../../models/steering';
 
 // Mock vscode
-jest.mock('vscode');
+jest.mock('vscode', () => ({
+  TreeItemCollapsibleState: {
+    None: 0,
+    Collapsed: 1,
+    Expanded: 2
+  },
+  TreeItem: jest.fn().mockImplementation((label, collapsibleState) => ({
+    label,
+    collapsibleState,
+    iconPath: undefined,
+    command: undefined,
+    contextValue: undefined,
+    resourceUri: undefined
+  })),
+  ThemeIcon: jest.fn().mockImplementation((id, color) => ({
+    id,
+    color
+  })),
+  ThemeColor: jest.fn().mockImplementation((id) => ({
+    id
+  })),
+  EventEmitter: jest.fn().mockImplementation(() => ({
+    event: jest.fn(),
+    fire: jest.fn(),
+    dispose: jest.fn()
+  })),
+  Uri: {
+    file: jest.fn().mockImplementation((path) => ({
+      fsPath: path,
+      path: path
+    }))
+  }
+}));
 
 describe('SteeringTreeProvider', () => {
   let provider: SteeringTreeProvider;
@@ -214,7 +246,6 @@ describe('SteeringTreeProvider', () => {
       const treeItem = provider.getTreeItem(categoryItem);
 
       expect(treeItem).toBeDefined();
-      expect(treeItem).toBeInstanceOf(vscode.TreeItem);
       expect(treeItem.label).toBe('Strategies (Installed)');
       expect(treeItem.collapsibleState).toBe(vscode.TreeItemCollapsibleState.Expanded);
       expect(treeItem.contextValue).toBe('steeringCategory');

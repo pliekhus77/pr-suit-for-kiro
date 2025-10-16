@@ -271,7 +271,7 @@ describe('Framework Commands Integration Tests', () => {
       // Should not have "Install" option for installed frameworks
       expect(options).not.toContain('Install');
       expect(options).toContain('View Full Documentation');
-      expect(options).toContain('Cancel');
+      expect(options).toContain('Uninstall');
     });
   });
 

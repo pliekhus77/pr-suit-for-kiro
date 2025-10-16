@@ -2,165 +2,222 @@
 inclusion: always
 ---
 
-# Azure Hosting Strategy Guide
+# Azure Well-Architected Strategy Guide
 
 ## Purpose
-Define Azure hosting options and decision criteria for .NET applications.
+Define Azure architecture strategy based on the 5 pillars of the Well-Architected Framework. Use Azure MCP tools to get detailed, up-to-date best practices for specific services and scenarios.
 
-## Hosting Decision Matrix
+## The 5 Pillars of Azure Well-Architected Framework
 
-| Service | Best For | Pros | Cons | Cost |
-|---------|----------|------|------|------|
-| **App Service** | Web apps, APIs, mobile backends | Easy deployment, auto-scale, managed | Limited control, Windows/Linux only | $$ |
-| **Container Apps** | Microservices, event-driven apps | Serverless containers, KEDA scaling, simple | Less control than AKS | $$ |
-| **AKS** | Complex microservices, full K8s control | Full Kubernetes, maximum flexibility | Complex, requires K8s expertise | $$$ |
-| **Functions** | Event-driven, short tasks | True serverless, pay-per-execution | Cold starts, execution limits | $ |
-| **Static Web Apps** | SPAs, JAMstack | Free tier, global CDN, auto-deploy | Static only (with API routes) | $ |
-| **Virtual Machines** | Legacy apps, full OS control | Complete control, any workload | Manual management, patching | $$$ |
+### 1. Reliability 🛡️
+**Goal:** Build resilient systems that recover from failures and continue to function
 
-## Quick Decision Tree
+**Core Principles:**
+- Design for failure (assume components will fail)
+- Eliminate single points of failure
+- Build self-healing capabilities
+- Test disaster recovery regularly
 
+**Key Metrics:** 99.9%+ availability, RTO < 4 hours, RPO < 1 hour
+
+**When to Use Azure MCP:** Get specific reliability patterns for your service (App Service, AKS, Functions, etc.)
+
+### 2. Security 🔒
+**Goal:** Protect applications and data through defense-in-depth
+
+**Core Principles:**
+- Zero Trust (never trust, always verify)
+- Least privilege access
+- Encrypt everything (at rest and in transit)
+- Monitor and respond to threats
+
+**Key Practices:** Managed Identity, Key Vault, Azure AD, network isolation, Microsoft Defender
+
+**When to Use Azure MCP:** Get security configurations for specific services and compliance requirements
+
+### 3. Cost Optimization 💰
+**Goal:** Maximize business value while minimizing costs
+
+**Core Principles:**
+- Right-size resources for actual usage
+- Use consumption-based pricing where possible
+- Implement auto-scaling
+- Monitor and optimize continuously
+
+**Key Practices:** Reserved instances, spot instances, auto-shutdown, cost alerts, resource tagging
+
+**When to Use Azure MCP:** Get cost optimization recommendations for your specific workload and usage patterns
+
+### 4. Operational Excellence 🔧
+**Goal:** Run and monitor systems to deliver business value and improve processes
+
+**Core Principles:**
+- Infrastructure as Code (IaC)
+- Automate everything possible
+- Monitor proactively
+- Learn from failures
+
+**Key Practices:** Bicep/Terraform, CI/CD pipelines, Application Insights, Log Analytics, automated testing
+
+**When to Use Azure MCP:** Get operational best practices for deployment, monitoring, and management of specific services
+
+### 5. Performance Efficiency ⚡
+**Goal:** Use computing resources efficiently to meet system requirements and maintain efficiency as demand changes
+
+**Core Principles:**
+- Choose the right services for your workload
+- Scale horizontally when possible
+- Use caching strategically
+- Optimize data access patterns
+
+**Key Practices:** CDN, Redis Cache, async/await patterns, database optimization, load balancing
+
+**When to Use Azure MCP:** Get performance tuning recommendations for your specific architecture and bottlenecks
+
+## Azure MCP Integration Strategy
+
+### When to Leverage Azure MCP Tools
+
+**During Architecture Design:**
+```bash
+# Get best practices for your chosen services
+Use Azure MCP: "Get best practices for App Service with SQL Database"
+Use Azure MCP: "Show security recommendations for Container Apps"
+Use Azure MCP: "Cost optimization strategies for AKS workloads"
 ```
-Is it a static site (HTML/JS/CSS)?
-├─ Yes → Static Web Apps
-└─ No → Is it event-driven/short-lived?
-    ├─ Yes → Azure Functions
-    └─ No → Does it need containers?
-        ├─ No → App Service (Web Apps)
-        └─ Yes → Need full Kubernetes control?
-            ├─ No → Container Apps
-            └─ Yes → AKS
+
+**During Implementation:**
+```bash
+# Get specific configurations and code examples
+Use Azure MCP: "Bicep template for App Service with managed identity"
+Use Azure MCP: "Application Insights configuration for .NET apps"
+Use Azure MCP: "Key Vault integration patterns"
 ```
 
-## Hosting by Application Type
+**During Operations:**
+```bash
+# Get troubleshooting and optimization guidance
+Use Azure MCP: "Diagnose App Service performance issues"
+Use Azure MCP: "Monitor AKS cluster health"
+Use Azure MCP: "Optimize SQL Database costs"
+```
 
-| Type | Primary | Alternative | Why |
-|------|---------|-------------|-----|
-| .NET Web Apps | App Service | Container Apps | Native .NET, easy deploy, auto-scale |
-| .NET APIs | App Service/Container Apps | Functions (HTTP) | API management, CORS, auth |
-| Microservices | Container Apps | AKS | Serverless containers, Dapr, KEDA |
-| Background Jobs | Functions (Timer/Queue) | Container Apps | Event-driven, pay-per-use |
-| Real-Time (SignalR) | App Service + SignalR | Container Apps + SignalR | Managed SignalR, WebSockets |
-| Blazor | Static Web Apps (WASM) / App Service (Server) | - | Native support, CDN |
+### MCP Tool Categories Available
 
-## Data Storage Decision Matrix
+| Category | Use For | Examples |
+|----------|---------|----------|
+| **Documentation** | Latest Azure guidance | Service limits, best practices, tutorials |
+| **Best Practices** | Architecture recommendations | Security baselines, performance patterns |
+| **Deployment** | IaC and CI/CD | Bicep templates, pipeline guidance |
+| **Monitoring** | Observability setup | Application Insights, Log Analytics queries |
+| **Troubleshooting** | Issue diagnosis | AppLens diagnostics, performance analysis |
 
-| Service | Best For | Use Case | Cost |
-|---------|----------|----------|------|
-| **Azure SQL Database** | Relational data, ACID transactions | Primary database for .NET apps | $$$ |
-| **Cosmos DB** | Global distribution, NoSQL | Multi-region, low-latency reads | $$$$ |
-| **PostgreSQL** | Open-source relational | Cost-effective relational DB | $$ |
-| **Blob Storage** | Files, images, backups | Unstructured data, CDN origin | $ |
-| **Table Storage** | Simple key-value | Logs, telemetry, cheap NoSQL | $ |
-| **Redis Cache** | Session state, caching | Performance optimization | $$ |
+## Quick Service Selection Guide
 
-## Integration Services
+**For detailed service comparisons and recommendations, use Azure MCP tools**
 
-| Service | Best For | Use Case |
-|---------|----------|----------|
-| **Service Bus** | Enterprise messaging | Reliable async messaging, queues, topics |
-| **Event Grid** | Event routing | Reactive programming, event-driven architecture |
-| **Event Hubs** | High-throughput streaming | Telemetry, logs, real-time analytics |
-| **Storage Queues** | Simple queuing | Basic async processing, low cost |
-| **API Management** | API gateway | Rate limiting, authentication, versioning |
+| Workload Type | Start Here | Then Ask Azure MCP |
+|---------------|------------|-------------------|
+| **Web Applications** | App Service | "Best practices for App Service reliability" |
+| **APIs** | App Service / Container Apps | "API security patterns in Azure" |
+| **Microservices** | Container Apps / AKS | "Microservices architecture on Azure" |
+| **Event-Driven** | Functions / Event Grid | "Event-driven patterns and best practices" |
+| **Data Processing** | Functions / Batch | "Data processing architecture recommendations" |
+| **Static Sites** | Static Web Apps | "Static web app deployment strategies" |
 
-## Well-Architected Pillars
+## Architecture Decision Process
 
-| Pillar | Key Practices |
-|--------|---------------|
-| **Reliability** | Availability zones, health checks, auto-healing, DR testing (99.9% target) |
-| **Security** | Managed Identity, Key Vault, Azure AD, encryption, network isolation, Defender |
-| **Cost** | Consumption pricing, right-sizing, reserved instances, auto-scale, monitoring |
-| **Operations** | IaC (Bicep/Terraform), CI/CD, App Insights, Log Analytics, automation |
-| **Performance** | CDN, caching (Redis), async/await, compression, query optimization |
+### 1. Define Requirements (Use Well-Architected Pillars)
+- **Reliability:** What's your availability target? DR requirements?
+- **Security:** What data classification? Compliance needs?
+- **Cost:** What's your budget? Usage patterns?
+- **Operations:** Team expertise? Automation requirements?
+- **Performance:** Latency requirements? Scale expectations?
 
-## Regions & Deployment
+### 2. Get Azure MCP Recommendations
+```bash
+# Example queries for Azure MCP
+"Architecture recommendations for e-commerce platform with 99.9% availability"
+"Security best practices for healthcare application on Azure"
+"Cost-effective architecture for seasonal workloads"
+```
 
-**Primary US Regions:** East US 2 (Virginia), West US 2 (Washington), Central US (Iowa - DR pair)  
-**Consider:** Data residency, latency, service availability, cost
+### 3. Validate Against Pillars
+- Does the architecture meet all 5 pillar requirements?
+- Are there trade-offs that need documentation?
+- What monitoring and alerting is needed?
 
-**Deployment Patterns:**
-- Blue-Green: App Service slots, Container Apps revisions (zero-downtime)
-- Canary: Traffic Manager, traffic splitting (gradual rollout)
-- Rolling: AKS, VM Scale Sets (incremental updates)
+### 4. Document Decisions (ADRs)
+- Record architectural choices and rationale
+- Include Well-Architected pillar considerations
+- Reference Azure MCP recommendations used
 
-**Monitoring (Required):**
-- Application Insights (APM, tracing)
-- Log Analytics (centralized logs)
-- Azure Monitor (metrics, alerts)
-- Health checks (liveness, readiness)
+## Common Architecture Patterns
 
-## Security Baseline
+**Get detailed implementations using Azure MCP tools**
 
-**Minimum Requirements:**
-- [ ] Managed Identity enabled (no connection strings in code)
-- [ ] Key Vault for secrets/certificates
-- [ ] Azure AD authentication for APIs
-- [ ] HTTPS only (TLS 1.2+)
-- [ ] Network isolation (VNet integration or Private Endpoints)
-- [ ] Microsoft Defender enabled
-- [ ] Diagnostic logs enabled
-- [ ] Regular security scans (Defender for DevOps)
+| Pattern | Services | Ask Azure MCP |
+|---------|----------|---------------|
+| **Web + API + DB** | App Service + SQL + Key Vault | "Best practices for 3-tier web application" |
+| **Microservices** | Container Apps + Service Bus + Cosmos DB | "Microservices patterns with Container Apps" |
+| **Event-Driven** | Event Grid + Functions + Storage | "Event-driven architecture best practices" |
+| **Data Pipeline** | Data Factory + Synapse + Storage | "Data processing pipeline recommendations" |
 
-## Cost Estimation
+## Monitoring & Observability Strategy
 
-| Environment | App Service | Azure SQL | Redis | Notes |
-|-------------|-------------|-----------|-------|-------|
-| Dev/Test | B1 ($13) | Basic ($5) | - | Functions: consumption |
-| Prod (Small) | S1 ($70) | S0 ($15) | C0 ($17) | App Insights: PAYG |
-| Prod (Medium) | P1V3 ($146) | S2 ($60) | C1 ($55) | + auto-scale |
+**Essential for all 5 pillars - use Azure MCP for specific configurations**
 
-**Use Azure Pricing Calculator for accurate estimates**
+| Pillar | What to Monitor | Azure MCP Query |
+|--------|-----------------|-----------------|
+| **Reliability** | Availability, errors, dependencies | "Application Insights reliability monitoring" |
+| **Security** | Failed logins, privilege escalation | "Security monitoring with Sentinel" |
+| **Cost** | Resource usage, budget alerts | "Cost monitoring and alerting setup" |
+| **Operations** | Deployment success, performance | "Operational monitoring best practices" |
+| **Performance** | Response times, throughput | "Performance monitoring configuration" |
 
-## IaC & CI/CD
+## Getting Started Checklist
 
-**IaC:** Bicep (preferred, native) > Terraform (multi-cloud) > ARM (avoid)
+### Phase 1: Foundation
+- [ ] Define requirements using 5 pillars
+- [ ] Use Azure MCP to get service recommendations
+- [ ] Create architecture diagrams (C4 model)
+- [ ] Document decisions in ADRs
 
-**Pipeline:**
-- Build: Restore, build, test, security scan, publish
-- Deploy: IaC → app → smoke tests → integration tests → release annotations
-- Tools: Azure DevOps Pipelines or GitHub Actions
+### Phase 2: Implementation
+- [ ] Use Azure MCP for IaC templates (Bicep/Terraform)
+- [ ] Implement security baseline (managed identity, Key Vault)
+- [ ] Set up monitoring (Application Insights, Log Analytics)
+- [ ] Configure CI/CD pipelines
 
-## Common Patterns
+### Phase 3: Operations
+- [ ] Use Azure MCP for troubleshooting guidance
+- [ ] Monitor all 5 pillars continuously
+- [ ] Regular architecture reviews
+- [ ] Cost optimization reviews
 
-**API + Database:** App Service → SQL + Redis + Key Vault + App Insights  
-**Microservices:** Container Apps → Service Bus + Cosmos DB + API Management  
-**Event-Driven:** Event Grid → Functions → Cosmos DB/Service Bus/Blob  
-**Web + API + Workers:** Static Web Apps → App Service → SQL + Service Bus → Functions
+## Key Principles
 
-## Migration & Governance
+**Start with Well-Architected:** Every decision should consider all 5 pillars  
+**Leverage Azure MCP:** Get current, detailed best practices for your specific scenario  
+**Document Everything:** ADRs for decisions, monitoring for operations  
+**Automate by Default:** IaC, CI/CD, monitoring, scaling  
+**Security First:** Zero Trust, least privilege, encrypt everything  
+**Monitor Continuously:** All pillars, not just performance  
 
-**Migration:**
-- Lift & Shift: VMs/App Service (low effort, minimal optimization)
-- Replatform: App Service/Container Apps (medium effort, managed services)
-- Refactor: Container Apps/Functions/Cosmos DB (high effort, cloud-native)
+## Anti-Patterns
 
-**Governance:** Azure Policy, Blueprints, Resource Tags, RBAC, Management Groups
-
-## Common Mistakes
-
-❌ Hardcoded connection strings → ✅ Managed Identity + Key Vault  
+❌ Ignore Well-Architected pillars → ✅ Design with all 5 pillars in mind  
+❌ Use outdated guidance → ✅ Leverage Azure MCP for latest best practices  
+❌ Manual processes → ✅ Automate everything possible  
 ❌ Single region → ✅ Multi-region for critical workloads  
-❌ No monitoring → ✅ App Insights + alerts  
-❌ Manual deploys → ✅ CI/CD pipelines  
-❌ Over-provisioning → ✅ Right-size + auto-scale  
-❌ No DR plan → ✅ Test backups and failover
-
-## Decision Checklist
-
-- [ ] App type, scalability, budget, team expertise
-- [ ] Compliance, performance, DR needs
-- [ ] Integration, monitoring, security requirements
+❌ No monitoring → ✅ Comprehensive observability from day one  
 
 ## Summary
 
-1. **Default choice:** App Service for web apps/APIs, Functions for event-driven
-2. **Containers:** Container Apps (simple) or AKS (complex)
-3. **Data:** Azure SQL (relational), Cosmos DB (NoSQL), Blob Storage (files)
-4. **Security:** Managed Identity, Key Vault, Azure AD, network isolation
-5. **Monitoring:** Application Insights + Log Analytics (required)
-6. **IaC:** Bicep preferred, Terraform alternative
-7. **Cost:** Start small, scale up, use consumption pricing
-8. **Regions:** East US 2 or West US 2 for most workloads
+1. **Foundation:** Use the 5 Well-Architected pillars as your design framework
+2. **Guidance:** Leverage Azure MCP tools for detailed, current best practices
+3. **Implementation:** Start with managed services, automate everything
+4. **Operations:** Monitor all pillars, not just performance
+5. **Continuous Improvement:** Regular reviews and optimization
 
-**Golden Rule:** Start with managed services (PaaS), avoid VMs unless necessary. Use Well-Architected Framework principles from day one.
+**Golden Rule:** Architecture is not a one-time decision. Use Azure MCP tools to stay current with evolving best practices and continuously optimize across all 5 pillars.

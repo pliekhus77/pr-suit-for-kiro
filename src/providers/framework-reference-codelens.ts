@@ -50,7 +50,10 @@ export class FrameworkReferenceCodeLensProvider implements vscode.CodeLensProvid
     try {
       const steeringPath = this.fileSystem.getSteeringPath();
       const documentPath = document.uri.fsPath;
-      return documentPath.startsWith(steeringPath) && documentPath.endsWith('.md');
+      // Normalize paths to handle different path separators
+      const normalizedSteeringPath = steeringPath.replace(/\\/g, '/');
+      const normalizedDocumentPath = documentPath.replace(/\\/g, '/');
+      return normalizedDocumentPath.startsWith(normalizedSteeringPath) && normalizedDocumentPath.endsWith('.md');
     } catch (error) {
       return false;
     }

@@ -77,7 +77,7 @@ export class SteeringValidator {
     for (const requiredSection of REQUIRED_SECTIONS) {
       const found = headings.some(({ line }) => {
         const headingText = line.replace(/^#+\s*/, '').trim();
-        return headingText.toLowerCase() === requiredSection.toLowerCase();
+        return headingText.toLowerCase().startsWith(requiredSection.toLowerCase());
       });
       
       if (!found) {

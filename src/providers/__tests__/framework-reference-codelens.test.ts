@@ -4,7 +4,16 @@ import { FrameworkReferenceCodeLensProvider } from '../framework-reference-codel
 import { FileSystemOperations } from '../../utils/file-system';
 
 // Mock vscode module
-jest.mock('vscode');
+jest.mock('vscode', () => ({
+  Range: jest.fn().mockImplementation((startLine, startChar, endLine, endChar) => ({
+    start: { line: startLine, character: startChar },
+    end: { line: endLine, character: endChar }
+  })),
+  CodeLens: jest.fn().mockImplementation((range, command) => ({
+    range,
+    command
+  }))
+}));
 
 describe('FrameworkReferenceCodeLensProvider', () => {
   let provider: FrameworkReferenceCodeLensProvider;
