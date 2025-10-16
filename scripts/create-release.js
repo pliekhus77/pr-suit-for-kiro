@@ -259,8 +259,8 @@ function main() {
         log('🚀 Pragmatic Rhino SUIT Release Creator', 'cyan');
         log('');
         log('Usage:', 'blue');
-        log('  node scripts/create-release.js <version-type>', 'white');
-        log('  node scripts/create-release.js <specific-version>', 'white');
+        log('  node scripts/create-release.js <version-type> [--skip-tests]', 'white');
+        log('  node scripts/create-release.js <specific-version> [--skip-tests]', 'white');
         log('');
         log('Version Types:', 'blue');
         log('  patch   - Increment patch version (1.2.3 → 1.2.4)', 'white');
@@ -273,10 +273,14 @@ function main() {
         log('  1.2.3-alpha.1 - Alpha pre-release', 'white');
         log('  1.2.3-rc.1    - Release candidate', 'white');
         log('');
+        log('Options:', 'blue');
+        log('  --skip-tests  - Skip test execution and coverage checks', 'white');
+        log('');
         log('Examples:', 'blue');
         log('  node scripts/create-release.js patch', 'white');
         log('  node scripts/create-release.js minor', 'white');
         log('  node scripts/create-release.js 1.2.3-beta.1', 'white');
+        log('  node scripts/create-release.js 0.2.3-test.1 --skip-tests', 'white');
         log('');
         log('Prerequisites:', 'yellow');
         log('  - Clean git working directory', 'white');
@@ -287,6 +291,7 @@ function main() {
     }
     
     const versionInput = args[0];
+    const skipTests = args.includes('--skip-tests');
     
     log('🚀 Starting release process...', 'cyan');
     log('');
@@ -329,8 +334,12 @@ function main() {
         success(`Version updated and committed`);
     }
     
-    // Run quality checks
-    runTests();
+    // Run quality checks (unless skipped)
+    if (skipTests) {
+        warning('Skipping tests and coverage checks (--skip-tests flag used)');
+    } else {
+        runTests();
+    }
     
     // Create and push tag
     const tag = createTag(newVersion);
